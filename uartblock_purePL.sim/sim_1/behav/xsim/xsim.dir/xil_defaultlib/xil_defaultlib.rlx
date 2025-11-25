@@ -1,0 +1,9 @@
+0.7
+2020.2
+May 22 2025
+00:13:55
+C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.sim/sim_1/behav/xsim/glbl.v,1741209010,verilog,,,,glbl,,,,,,,,
+C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/bram_controller_module.v,1763462109,verilog,,C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/pulse_stretcher.v,,bram_controller_module,,,../../../../../../../../../Xilinx/2025.1/Vivado/data/rsb/busdef,,,,,
+C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/pulse_stretcher.v,1763462109,verilog,,C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/uart_receiver_module.v,,pulse_stretcher,,,../../../../../../../../../Xilinx/2025.1/Vivado/data/rsb/busdef,,,,,
+C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_module.v,1763462109,verilog,,,,top_module,,,../../../../../../../../../Xilinx/2025.1/Vivado/data/rsb/busdef,,,,,
+C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/uart_receiver_module.v,1763462109,verilog,,C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_module.v,,uart_receiver_module,,,../../../../../../../../../Xilinx/2025.1/Vivado/data/rsb/busdef,,,,,

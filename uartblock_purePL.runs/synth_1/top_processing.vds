@@ -1,0 +1,495 @@
+#-----------------------------------------------------------
+# Vivado v2025.1 (64-bit)
+# SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
+# IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
+# SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
+# Start of session at: Tue Nov 25 14:33:30 2025
+# Process ID         : 12328
+# Current directory  : C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.runs/synth_1
+# Command line       : vivado.exe -log top_processing.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source top_processing.tcl
+# Log file           : C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.runs/synth_1/top_processing.vds
+# Journal file       : C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.runs/synth_1\vivado.jou
+# Running On         : BOOK-JBCPDRK7D5
+# Platform           : Windows Server 2016 or Windows 10
+# Operating System   : 26100
+# Processor Detail   : 13th Gen Intel(R) Core(TM) i7-1360P
+# CPU Frequency      : 2611 MHz
+# CPU Physical cores : 12
+# CPU Logical cores  : 16
+# Host memory        : 16854 MB
+# Swap memory        : 45149 MB
+# Total Virtual      : 62004 MB
+# Available Virtual  : 33486 MB
+#-----------------------------------------------------------
+source top_processing.tcl -notrace
+Command: read_checkpoint -auto_incremental -incremental C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/utils_1/imports/synth_1/top_module.dcp
+INFO: [Vivado 12-5825] Read reference checkpoint from C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/utils_1/imports/synth_1/top_module.dcp for incremental synthesis
+INFO: [Vivado 12-7989] Please ensure there are no constraint changes
+Command: synth_design -top top_processing -part xc7z020clg484-1
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7z020'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7z020'
+INFO: [Device 21-403] Loading part xc7z020clg484-1
+INFO: [Designutils 20-5440] No compile time benefit to using incremental synthesis; A full resynthesis will be run
+INFO: [Designutils 20-4379] Flow is switching to default flow due to incremental criteria not met. If you would like to alter this behaviour and have the flow terminate instead, please set the following parameter config_implementation {autoIncr.Synth.RejectBehavior Terminate}
+INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 2 processes.
+INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
+INFO: [Synth 8-7075] Helper process launched with PID 12868
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:04 ; elapsed = 00:00:04 . Memory (MB): peak = 1213.812 ; gain = 494.453
+---------------------------------------------------------------------------------
+INFO: [Synth 8-11241] undeclared symbol 'gray_byte', assumed default net type 'wire' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:328]
+INFO: [Synth 8-11241] undeclared symbol 'gray_valid', assumed default net type 'wire' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:329]
+WARNING: [Synth 8-8895] 'gray_byte' is already implicitly declared on line 328 [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:350]
+WARNING: [Synth 8-8895] 'gray_valid' is already implicitly declared on line 329 [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:351]
+INFO: [Synth 8-6157] synthesizing module 'top_processing' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:10]
+INFO: [Synth 8-6157] synthesizing module 'rx' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/rx.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'rx' (0#1) [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/rx.v:1]
+INFO: [Synth 8-6157] synthesizing module 'tx' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/tx.v:3]
+	Parameter CLOCK_FREQ bound to: 100000000 - type: integer 
+	Parameter BAUD_RATE bound to: 115200 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'tx' (0#1) [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/tx.v:3]
+INFO: [Synth 8-6157] synthesizing module 'bram_fifo' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/bram_fifo.v:2]
+	Parameter DEPTH bound to: 4096 - type: integer 
+	Parameter ADDR_WIDTH bound to: 12 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'bram_11' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/bram11.v:4]
+	Parameter DEPTH bound to: 4096 - type: integer 
+	Parameter ADDR_WIDTH bound to: 12 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'bram_11' (0#1) [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/bram11.v:4]
+INFO: [Synth 8-6155] done synthesizing module 'bram_fifo' (0#1) [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/bram_fifo.v:2]
+INFO: [Synth 8-6157] synthesizing module 'pixel_assembler' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/pixel_assembler.v:2]
+	Parameter PIXEL_WIDTH bound to: 8 - type: integer 
+	Parameter CHANNELS bound to: 3 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'pixel_assembler' (0#1) [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/pixel_assembler.v:2]
+INFO: [Synth 8-6157] synthesizing module 'rl_agent_simple' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:537]
+	Parameter INTERVAL bound to: 100000 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'rl_agent_simple' (0#1) [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:537]
+INFO: [Synth 8-6157] synthesizing module 'clock_module_simple' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:574]
+INFO: [Synth 8-6155] done synthesizing module 'clock_module_simple' (0#1) [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:574]
+INFO: [Synth 8-6157] synthesizing module 'resizer_core' [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/resizer_core.v:6]
+	Parameter IN_WIDTH bound to: 128 - type: integer 
+	Parameter IN_HEIGHT bound to: 128 - type: integer 
+	Parameter OUT_WIDTH bound to: 64 - type: integer 
+	Parameter OUT_HEIGHT bound to: 64 - type: integer 
+	Parameter PIXEL_WIDTH bound to: 8 - type: integer 
+	Parameter CHANNELS bound to: 3 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'resizer_core' (0#1) [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/resizer_core.v:6]
+INFO: [Synth 8-6157] synthesizing module 'pixel_splitter' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/pixel_splitter.v:2]
+	Parameter PIXEL_WIDTH bound to: 8 - type: integer 
+	Parameter CHANNELS bound to: 3 - type: integer 
+INFO: [Synth 8-155] case statement is not full and has no default [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/pixel_splitter.v:32]
+INFO: [Synth 8-6155] done synthesizing module 'pixel_splitter' (0#1) [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/pixel_splitter.v:2]
+INFO: [Synth 8-6157] synthesizing module 'grayscale_core' [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:3]
+	Parameter IMG_WIDTH bound to: 64 - type: integer 
+	Parameter IMG_HEIGHT bound to: 64 - type: integer 
+	Parameter PIXEL_WIDTH bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'grayscale_core' (0#1) [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:3]
+INFO: [Synth 8-6157] synthesizing module 'logger_simple' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:639]
+	Parameter INTERVAL_CYCLES bound to: 20 - type: integer 
+	Parameter ENTRY_WIDTH bound to: 16 - type: integer 
+	Parameter LOGGER_DEPTH bound to: 4096 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'logger_simple' (0#1) [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:639]
+INFO: [Synth 8-6155] done synthesizing module 'top_processing' (0#1) [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:10]
+WARNING: [Synth 8-6014] Unused sequential element b2_reg was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/pixel_assembler.v:26]
+WARNING: [Synth 8-6014] Unused sequential element fifo3_rd_ready_reg_reg was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:443]
+WARNING: [Synth 8-6014] Unused sequential element pixel2_ready_reg was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:299]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 with 1st driver pin 'grayscale_inst/write_signal' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 with 2nd driver pin 'GND' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 is connected to at least one constant driver which has been preserved, other driver is ignored [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 with 1st driver pin 'grayscale_inst/data_out[0]' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 with 2nd driver pin 'GND' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 is connected to at least one constant driver which has been preserved, other driver is ignored [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 with 1st driver pin 'grayscale_inst/data_out[1]' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 with 2nd driver pin 'GND' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 is connected to at least one constant driver which has been preserved, other driver is ignored [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 with 1st driver pin 'grayscale_inst/data_out[2]' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 with 2nd driver pin 'GND' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 is connected to at least one constant driver which has been preserved, other driver is ignored [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 with 1st driver pin 'grayscale_inst/data_out[3]' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 with 2nd driver pin 'GND' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 is connected to at least one constant driver which has been preserved, other driver is ignored [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 with 1st driver pin 'grayscale_inst/data_out[4]' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 with 2nd driver pin 'GND' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 is connected to at least one constant driver which has been preserved, other driver is ignored [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 with 1st driver pin 'grayscale_inst/data_out[5]' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 with 2nd driver pin 'GND' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 is connected to at least one constant driver which has been preserved, other driver is ignored [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 with 1st driver pin 'grayscale_inst/data_out[6]' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 with 2nd driver pin 'GND' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 is connected to at least one constant driver which has been preserved, other driver is ignored [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 with 1st driver pin 'grayscale_inst/data_out[7]' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 with 2nd driver pin 'GND' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v-355.64 is connected to at least one constant driver which has been preserved, other driver is ignored [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_processing.v:355]
+WARNING: [Synth 8-7129] Port divider_grayscale[7] in module logger_simple is either unconnected or has no load
+WARNING: [Synth 8-7129] Port divider_grayscale[6] in module logger_simple is either unconnected or has no load
+WARNING: [Synth 8-7129] Port divider_grayscale[5] in module logger_simple is either unconnected or has no load
+WARNING: [Synth 8-7129] Port divider_grayscale[4] in module logger_simple is either unconnected or has no load
+WARNING: [Synth 8-7129] Port divider_grayscale[3] in module logger_simple is either unconnected or has no load
+WARNING: [Synth 8-7129] Port divider_grayscale[2] in module logger_simple is either unconnected or has no load
+WARNING: [Synth 8-7129] Port divider_grayscale[1] in module logger_simple is either unconnected or has no load
+WARNING: [Synth 8-7129] Port divider_grayscale[0] in module logger_simple is either unconnected or has no load
+---------------------------------------------------------------------------------
+Finished RTL Elaboration : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 1330.262 ; gain = 610.902
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 1330.262 ; gain = 610.902
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 1330.262 ; gain = 610.902
+---------------------------------------------------------------------------------
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.014 . Memory (MB): peak = 1330.262 ; gain = 0.000
+INFO: [Project 1-570] Preparing netlist for logic optimization
+
+Processing XDC Constraints
+Initializing timing engine
+Parsing XDC File [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/constrs_1/new/jA1_ld0.xdc]
+Finished Parsing XDC File [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/constrs_1/new/jA1_ld0.xdc]
+INFO: [Project 1-236] Implementation specific constraints were found while reading constraint file [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/constrs_1/new/jA1_ld0.xdc]. These constraints will be ignored for synthesis but will be used in implementation. Impacted constraints are listed in the file [.Xil/top_processing_propImpl.xdc].
+Resolution: To avoid this warning, move constraints listed in [.Xil/top_processing_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
+Completed Processing XDC Constraints
+
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.001 . Memory (MB): peak = 1409.426 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.004 . Memory (MB): peak = 1409.426 ; gain = 0.000
+INFO: [Designutils 20-5440] No compile time benefit to using incremental synthesis; A full resynthesis will be run
+INFO: [Designutils 20-4379] Flow is switching to default flow due to incremental criteria not met. If you would like to alter this behaviour and have the flow terminate instead, please set the following parameter config_implementation {autoIncr.Synth.RejectBehavior Terminate}
+---------------------------------------------------------------------------------
+Finished Constraint Validation : Time (s): cpu = 00:00:10 ; elapsed = 00:00:11 . Memory (MB): peak = 1409.426 ; gain = 690.066
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Loading Part and Timing Information
+---------------------------------------------------------------------------------
+Loading part: xc7z020clg484-1
+---------------------------------------------------------------------------------
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:10 ; elapsed = 00:00:11 . Memory (MB): peak = 1409.426 ; gain = 690.066
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying 'set_property' XDC Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:10 ; elapsed = 00:00:11 . Memory (MB): peak = 1409.426 ; gain = 690.066
+---------------------------------------------------------------------------------
+INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'rx'
+INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'pixel_assembler'
+INFO: [Synth 8-802] inferred FSM for state register 'core_mask_reg' in module 'rl_agent_simple'
+INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'pixel_splitter'
+INFO: [Synth 8-802] inferred FSM for state register 'tx_state_reg' in module 'top_processing'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                    IDLE |                               00 |                               00
+               START_BIT |                               01 |                               01
+               DATA_BITS |                               10 |                               10
+                STOP_BIT |                               11 |                               11
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'sequential' in module 'rx'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                 iSTATE2 |                             0001 |                               00
+                  iSTATE |                             0010 |                               01
+                 iSTATE0 |                             0100 |                               10
+                 iSTATE1 |                             1000 |                               11
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'one-hot' in module 'pixel_assembler'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                 iSTATE0 |                               01 |                               01
+                  iSTATE |                               10 |                               10
+*
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3898] No Re-encoding of one hot register 'core_mask_reg' in module 'rl_agent_simple'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                 iSTATE1 |                               00 |                               00
+                  iSTATE |                               01 |                               01
+                 iSTATE0 |                               10 |                               10
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'sequential' in module 'pixel_splitter'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                  S_IDLE |                             0000 |                             0000
+                S_STREAM |                             0001 |                             0001
+               S_MARK1_0 |                             0010 |                             0010
+               S_MARK1_1 |                             0011 |                             0011
+               S_MARK1_2 |                             0100 |                             0100
+               S_MARK1_3 |                             0101 |                             0101
+               S_LOG_REQ |                             0110 |                             0110
+                S_LOG_RD |                             0111 |                             0111
+               S_LOG_MSB |                             1000 |                             1000
+               S_LOG_LSB |                             1001 |                             1001
+               S_MARK2_0 |                             1010 |                             1010
+               S_MARK2_1 |                             1011 |                             1011
+               S_MARK2_2 |                             1100 |                             1100
+               S_MARK2_3 |                             1101 |                             1101
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'tx_state_reg' using encoding 'sequential' in module 'top_processing'
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:11 ; elapsed = 00:00:11 . Memory (MB): peak = 1409.426 ; gain = 690.066
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start RTL Component Statistics 
+---------------------------------------------------------------------------------
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input   32 Bit       Adders := 2     
+	   2 Input   16 Bit       Adders := 6     
+	   2 Input   13 Bit       Adders := 6     
+	   3 Input   13 Bit       Adders := 9     
+	   2 Input   12 Bit       Adders := 1     
+	   2 Input    8 Bit       Adders := 2     
+	   2 Input    7 Bit       Adders := 2     
+	   2 Input    5 Bit       Adders := 1     
+	   2 Input    4 Bit       Adders := 1     
+	   2 Input    3 Bit       Adders := 1     
++---XORs : 
+	   2 Input     13 Bit         XORs := 6     
+	  13 Input     13 Bit         XORs := 6     
++---Registers : 
+	               24 Bit    Registers := 4     
+	               16 Bit    Registers := 8     
+	               13 Bit    Registers := 18    
+	               10 Bit    Registers := 1     
+	                8 Bit    Registers := 16    
+	                7 Bit    Registers := 2     
+	                5 Bit    Registers := 1     
+	                4 Bit    Registers := 1     
+	                3 Bit    Registers := 4     
+	                1 Bit    Registers := 27    
++---RAMs : 
+	              64K Bit	(4096 X 16 bit)          RAMs := 1     
+	              32K Bit	(4096 X 8 bit)          RAMs := 3     
++---Muxes : 
+	   4 Input   16 Bit        Muxes := 1     
+	   2 Input   16 Bit        Muxes := 2     
+	   2 Input   10 Bit        Muxes := 1     
+	   4 Input    8 Bit        Muxes := 1     
+	   3 Input    8 Bit        Muxes := 1     
+	  14 Input    8 Bit        Muxes := 1     
+	   2 Input    4 Bit        Muxes := 9     
+	   4 Input    4 Bit        Muxes := 2     
+	  14 Input    4 Bit        Muxes := 1     
+	   4 Input    3 Bit        Muxes := 1     
+	   4 Input    2 Bit        Muxes := 1     
+	   2 Input    2 Bit        Muxes := 5     
+	   3 Input    2 Bit        Muxes := 1     
+	   2 Input    1 Bit        Muxes := 14    
+	   4 Input    1 Bit        Muxes := 11    
+	   3 Input    1 Bit        Muxes := 4     
+	  14 Input    1 Bit        Muxes := 9     
+---------------------------------------------------------------------------------
+Finished RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Part Resource Summary
+---------------------------------------------------------------------------------
+Part Resources:
+DSPs: 220 (col length:60)
+BRAMs: 280 (col length: RAMB18 60 RAMB36 30)
+---------------------------------------------------------------------------------
+Finished Part Resource Summary
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Cross Boundary and Area Optimization
+---------------------------------------------------------------------------------
+WARNING: [Synth 8-7080] Parallel synthesis criteria is not met
+WARNING: [Synth 8-3917] design top_processing has port led_gray_busy driven by constant 0
+WARNING: [Synth 8-7129] Port divider_grayscale[7] in module logger_simple is either unconnected or has no load
+WARNING: [Synth 8-7129] Port divider_grayscale[6] in module logger_simple is either unconnected or has no load
+WARNING: [Synth 8-7129] Port divider_grayscale[5] in module logger_simple is either unconnected or has no load
+WARNING: [Synth 8-7129] Port divider_grayscale[4] in module logger_simple is either unconnected or has no load
+WARNING: [Synth 8-7129] Port divider_grayscale[3] in module logger_simple is either unconnected or has no load
+WARNING: [Synth 8-7129] Port divider_grayscale[2] in module logger_simple is either unconnected or has no load
+WARNING: [Synth 8-7129] Port divider_grayscale[1] in module logger_simple is either unconnected or has no load
+WARNING: [Synth 8-7129] Port divider_grayscale[0] in module logger_simple is either unconnected or has no load
+INFO: [Synth 8-5784] Optimized 8 bits of RAM "fifo3/bram_inst/mem_reg" due to constant propagation. Old ram width 8 bits, new ram width 0 bits.
+WARNING: [Synth 8-5785] Removed RAM "fifo3/bram_inst/mem_reg" due to constant propagation. Write data stuck at zero 
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin data_out[7] with 1st driver pin 'grayscale_inst/data_out_reg[7]/Q' [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin data_out[7] with 2nd driver pin 'GND' [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net data_out[7] is connected to at least one constant driver which has been preserved, other driver is ignored [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin data_out[6] with 1st driver pin 'grayscale_inst/data_out_reg[6]/Q' [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin data_out[6] with 2nd driver pin 'GND' [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net data_out[6] is connected to at least one constant driver which has been preserved, other driver is ignored [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin data_out[5] with 1st driver pin 'grayscale_inst/data_out_reg[5]/Q' [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin data_out[5] with 2nd driver pin 'GND' [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net data_out[5] is connected to at least one constant driver which has been preserved, other driver is ignored [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin data_out[4] with 1st driver pin 'grayscale_inst/data_out_reg[4]/Q' [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin data_out[4] with 2nd driver pin 'GND' [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net data_out[4] is connected to at least one constant driver which has been preserved, other driver is ignored [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin data_out[3] with 1st driver pin 'grayscale_inst/data_out_reg[3]/Q' [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin data_out[3] with 2nd driver pin 'GND' [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net data_out[3] is connected to at least one constant driver which has been preserved, other driver is ignored [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin data_out[2] with 1st driver pin 'grayscale_inst/data_out_reg[2]/Q' [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin data_out[2] with 2nd driver pin 'GND' [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net data_out[2] is connected to at least one constant driver which has been preserved, other driver is ignored [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin data_out[1] with 1st driver pin 'grayscale_inst/data_out_reg[1]/Q' [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin data_out[1] with 2nd driver pin 'GND' [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net data_out[1] is connected to at least one constant driver which has been preserved, other driver is ignored [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin data_out[0] with 1st driver pin 'grayscale_inst/data_out_reg[0]/Q' [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin data_out[0] with 2nd driver pin 'GND' [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net data_out[0] is connected to at least one constant driver which has been preserved, other driver is ignored [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:33]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin write_signal with 1st driver pin 'grayscale_inst/write_signal_reg/Q' [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:34]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin write_signal with 2nd driver pin 'GND' [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:34]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net write_signal is connected to at least one constant driver which has been preserved, other driver is ignored [C:/Users/iamri/Documents/Nikhil_Cores/merged/Stages/grayscale_core.v:34]
+---------------------------------------------------------------------------------
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:14 ; elapsed = 00:00:15 . Memory (MB): peak = 1409.836 ; gain = 690.477
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+
+Block RAM: Preliminary Mapping Report (see note below)
++---------------+---------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|Module Name    | RTL Object          | PORT A (Depth x Width) | W | R | PORT B (Depth x Width) | W | R | Ports driving FF | RAMB18 | RAMB36 | 
++---------------+---------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|top_processing | logger_inst/mem_reg | 4 K x 16(READ_FIRST)   | W |   | 4 K x 16(WRITE_FIRST)  |   | R | Port A and B     | 0      | 2      | 
++---------------+---------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+
+Note: The table above is a preliminary report that shows the Block RAMs at the current stage of the synthesis flow. Some Block RAMs may be reimplemented as non Block RAM primitives later in the synthesis flow. Multiple instantiated Block RAMs are reported only once. 
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying XDC Timing Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:00:18 ; elapsed = 00:00:20 . Memory (MB): peak = 1556.402 ; gain = 837.043
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Timing Optimization : Time (s): cpu = 00:00:18 ; elapsed = 00:00:20 . Memory (MB): peak = 1557.363 ; gain = 838.004
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+
+Block RAM: Final Mapping Report
++---------------+---------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|Module Name    | RTL Object          | PORT A (Depth x Width) | W | R | PORT B (Depth x Width) | W | R | Ports driving FF | RAMB18 | RAMB36 | 
++---------------+---------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|top_processing | logger_inst/mem_reg | 4 K x 16(READ_FIRST)   | W |   | 4 K x 16(WRITE_FIRST)  |   | R | Port A and B     | 0      | 2      | 
++---------------+---------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Technology Mapping
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Technology Mapping : Time (s): cpu = 00:00:19 ; elapsed = 00:00:20 . Memory (MB): peak = 1571.027 ; gain = 851.668
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished IO Insertion : Time (s): cpu = 00:00:21 ; elapsed = 00:00:23 . Memory (MB): peak = 1800.191 ; gain = 1080.832
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Instances
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:00:21 ; elapsed = 00:00:23 . Memory (MB): peak = 1800.191 ; gain = 1080.832
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Rebuilding User Hierarchy
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:21 ; elapsed = 00:00:23 . Memory (MB): peak = 1800.191 ; gain = 1080.832
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Ports
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Ports : Time (s): cpu = 00:00:21 ; elapsed = 00:00:23 . Memory (MB): peak = 1800.191 ; gain = 1080.832
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:21 ; elapsed = 00:00:23 . Memory (MB): peak = 1801.234 ; gain = 1081.875
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Nets
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Nets : Time (s): cpu = 00:00:21 ; elapsed = 00:00:23 . Memory (MB): peak = 1801.234 ; gain = 1081.875
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Writing Synthesis Report
+---------------------------------------------------------------------------------
+
+Report BlackBoxes: 
++-+--------------+----------+
+| |BlackBox name |Instances |
++-+--------------+----------+
++-+--------------+----------+
+
+Report Cell Usage: 
++------+---------+------+
+|      |Cell     |Count |
++------+---------+------+
+|1     |BUFG     |     1|
+|2     |CARRY4   |   113|
+|3     |LUT1     |   130|
+|4     |LUT2     |   139|
+|5     |LUT3     |    80|
+|6     |LUT4     |    61|
+|7     |LUT5     |    44|
+|8     |LUT6     |   105|
+|9     |RAMB36E1 |     2|
+|10    |FDCE     |   218|
+|11    |FDPE     |    12|
+|12    |FDRE     |   253|
+|13    |FDSE     |     6|
+|14    |IBUF     |     3|
+|15    |OBUF     |     5|
++------+---------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:00:21 ; elapsed = 00:00:23 . Memory (MB): peak = 1801.234 ; gain = 1081.875
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 27 critical warnings and 11 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:00:15 ; elapsed = 00:00:21 . Memory (MB): peak = 1801.234 ; gain = 1002.711
+Synthesis Optimization Complete : Time (s): cpu = 00:00:21 ; elapsed = 00:00:23 . Memory (MB): peak = 1801.234 ; gain = 1081.875
+INFO: [Project 1-571] Translating synthesized netlist
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.008 . Memory (MB): peak = 1801.234 ; gain = 0.000
+INFO: [Netlist 29-17] Analyzing 115 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1801.234 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+Synth Design complete | Checksum: b88f2e6f
+INFO: [Common 17-83] Releasing license: Synthesis
+59 Infos, 24 Warnings, 54 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:00:24 ; elapsed = 00:00:27 . Memory (MB): peak = 1801.234 ; gain = 1311.152
+INFO: [runtcl-6] Synthesis results are not added to the cache due to CRITICAL_WARNING
+Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.004 . Memory (MB): peak = 1801.234 ; gain = 0.000
+INFO: [Common 17-1381] The checkpoint 'C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.runs/synth_1/top_processing.dcp' has been generated.
+INFO: [Vivado 12-24828] Executing command : report_utilization -file top_processing_utilization_synth.rpt -pb top_processing_utilization_synth.pb
+INFO: [Common 17-206] Exiting Vivado at Tue Nov 25 14:34:03 2025...
