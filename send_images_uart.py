@@ -32,7 +32,7 @@ Requirements: pyserial, Pillow
 Install: pip install -r requirements.txt
 """
 from __future__ import annotations
-import argparse
+from types import SimpleNamespace
 import csv
 import logging
 import sys
@@ -69,27 +69,61 @@ class UartImageSender:
             self.ser.close()
             logger.info("Closed serial port")
 
-    def send_with_length(self, payload: bytes, read_timeout: float) -> bytes:
+    def send_with_length(self, payload: bytes, read_timeout: float, expected_len: Optional[int] = None) -> bytes:
+        """
+        Send payload with length header. If remote responds with RESP_BYTE header, use that
+        length. If not (Verilog may stream raw bytes), fall back to reading `expected_len`
+        bytes (if provided) or whatever arrives before timeout.
+        """
         length = len(payload)
         header = bytes([START_BYTE]) + length.to_bytes(4, "little")
         self.ser.write(header + payload)
         self.ser.flush()
         logger.debug("Sent header+payload (%d bytes)", length)
-        # Wait for response header
+        # Wait for response header (or fallback to raw)
         start_time = time.time()
         self.ser.timeout = read_timeout
         hdr = self.ser.read(5)
-        if len(hdr) < 5 or hdr[0] != RESP_BYTE:
-            raise TimeoutError("Did not receive valid response header")
-        resp_len = int.from_bytes(hdr[1:5], "little")
+        # If we got a proper header from device, use its length
+        if len(hdr) >= 5 and hdr[0] == RESP_BYTE:
+            resp_len = int.from_bytes(hdr[1:5], "little")
+            data = bytearray()
+            while len(data) < resp_len:
+                chunk = self.ser.read(resp_len - len(data))
+                if not chunk:
+                    raise TimeoutError("Timed out receiving response payload")
+                data.extend(chunk)
+            logger.debug("Received response (%d bytes)", resp_len)
+            logger.info("Transfer complete in %.3fs", time.time() - start_time)
+            return bytes(data)
+
+        # Fallback: device did not send RESP header (common when FPGA streams raw bytes)
+        # Treat any bytes already read (hdr) as part of the payload and continue
         data = bytearray()
-        while len(data) < resp_len:
-            chunk = self.ser.read(resp_len - len(data))
+        if hdr:
+            data.extend(hdr)
+
+        # If expected_len provided, read until that many bytes collected
+        if expected_len is not None and expected_len > 0:
+            # we've already got len(data) bytes; continue until expected_len
+            while len(data) < expected_len:
+                chunk = self.ser.read(expected_len - len(data))
+                if not chunk:
+                    # timeout occurred
+                    break
+                data.extend(chunk)
+            logger.debug("Fallback: collected %d bytes (expected %d)", len(data), expected_len)
+            logger.info("Transfer (fallback) complete in %.3fs", time.time() - start_time)
+            return bytes(data)
+
+        # No expected length: read until timeout and return whatever arrived
+        while True:
+            chunk = self.ser.read(1024)
             if not chunk:
-                raise TimeoutError("Timed out receiving response payload")
+                break
             data.extend(chunk)
-        logger.debug("Received response (%d bytes)", resp_len)
-        logger.info("Transfer complete in %.3fs", time.time() - start_time)
+        logger.debug("Fallback: collected %d bytes (no expected length)", len(data))
+        logger.info("Transfer (fallback) complete in %.3fs", time.time() - start_time)
         return bytes(data)
 
     def send_with_sentinel(self, payload: bytes, sentinel: bytes, read_timeout: float) -> bytes:
@@ -154,8 +188,8 @@ def write_csv(csv_path: Path, row: dict) -> None:
 
 def process_folder(args):
     input_dir = Path(args.input_dir)
-    out_img_dir = "input"
-    out_csv_dir = "output"
+    out_img_dir = Path(args.output_dir)
+    out_csv_dir = Path(args.output_csv_dir)
     out_img_dir.mkdir(parents=True, exist_ok=True)
     out_csv_dir.mkdir(parents=True, exist_ok=True)
 
@@ -173,7 +207,10 @@ def process_folder(args):
             try:
                 payload = load_image_bytes(img_path, args.in_width, args.in_height)
                 if args.mode == 'length':
-                    resp = sender.send_with_length(payload, args.read_timeout)
+                    expected = None
+                    if getattr(args, 'out_width', None) and getattr(args, 'out_height', None):
+                        expected = int(args.out_width) * int(args.out_height)
+                    resp = sender.send_with_length(payload, args.read_timeout, expected_len=expected)
                 else:
                     resp = sender.send_with_sentinel(payload, args.sentinel, args.read_timeout)
                 # Prepare output naming
@@ -196,19 +233,35 @@ def process_folder(args):
                 success_count += 1
                 logger.info("Processed %s -> %s", img_path.name, out_img_name)
             except Exception as e:
+                # Attempt to read any bytes that may have been received from device
+                bytes_received = 0
+                try:
+                    if hasattr(sender, 'ser') and sender.ser is not None:
+                        # read whatever is currently available in the input buffer
+                        avail = 0
+                        try:
+                            avail = sender.ser.in_waiting
+                        except Exception:
+                            avail = 0
+                        if avail > 0:
+                            _buf = sender.ser.read(avail)
+                            bytes_received = len(_buf)
+                except Exception:
+                    bytes_received = 0
+
                 csv_path = out_csv_dir / f"{img_path.stem}.csv"
                 write_csv(csv_path, {
                     'id': idx,
                     'input_name': img_path.name,
-                    'bytes_sent': 0,
-                    'bytes_received': 0,
+                    'bytes_sent': len(payload) if 'payload' in locals() else 0,
+                    'bytes_received': bytes_received,
                     'duration_s': round(time.time() - t0, 6),
                     'output_image_path': '',
                     'mode': args.mode,
                     'success': False,
                     'timestamp': time.strftime('%Y-%m-%dT%H:%M:%S')
                 })
-                logger.error("Failed %s: %s", img_path.name, e)
+                logger.error("Failed %s: %s (bytes_received=%d)", img_path.name, e, bytes_received)
                 if args.stop_on_error:
                     break
         logger.info("Completed %d/%d images in %.2fs", success_count, len(images), time.time() - start_global)
@@ -217,28 +270,30 @@ def process_folder(args):
     return 0 if success_count == len(images) else 2
 
 
-def parse_args(argv=None):
-    p = argparse.ArgumentParser(description="Send images over UART and collect processed responses")
-    p.add_argument('--input-dir', required=True, help='Directory containing input images')
-    p.add_argument('--output-dir', default='output', help='Directory to store output images')
-    p.add_argument('--output-csv-dir', default='output_csv', help='Directory to store per-image CSV logs')
-    p.add_argument('--port', default=DEFAULT_PORT, help='Serial port (default COM4)')
-    p.add_argument('--baud', type=int, default=DEFAULT_BAUD, help='Baud rate')
-    p.add_argument('--timeout', type=float, default=2.0, help='Serial base timeout (seconds)')
-    p.add_argument('--read-timeout', type=float, default=5.0, help='Read timeout per image (seconds)')
-    p.add_argument('--mode', choices=['length', 'sentinel'], default='length', help='Transfer protocol mode')
-    p.add_argument('--sentinel', type=lambda s: s.encode('utf-8'), default=SENTINEL_DEFAULT, help='Sentinel bytes for sentinel mode (default /0/0)')
-    p.add_argument('--in-width', type=int, help='Resize input width before sending')
-    p.add_argument('--in-height', type=int, help='Resize input height before sending')
-    p.add_argument('--out-width', type=int, help='Expected output width (grayscale) for reconstruction')
-    p.add_argument('--out-height', type=int, help='Expected output height (grayscale) for reconstruction')
-    p.add_argument('--stop-on-error', action='store_true', help='Abort on first failure')
-    p.add_argument('--log-level', default='INFO', choices=['DEBUG','INFO','WARNING','ERROR'])
-    return p.parse_args(argv)
+# Configuration: hardcoded paths and UART/settings
+# Edit these variables below to match your environment.
+def get_hardcoded_args():
+    return SimpleNamespace(
+        input_dir='input',            # folder containing input images
+        output_dir='output',
+        output_csv_dir='output_csv',
+        port=DEFAULT_PORT,
+        baud=DEFAULT_BAUD,
+        timeout=2.0,
+        read_timeout=10.0,
+        mode='length',                 # 'length' or 'sentinel'
+        sentinel=SENTINEL_DEFAULT,
+        in_width=128,                  # resize inputs to this (or None)
+        in_height=128,
+        out_width=64,                  # expected output image size for reconstruction
+        out_height=64,
+        stop_on_error=False,
+        log_level='INFO'
+    )
 
 
 def main(argv=None):
-    args = parse_args(argv)
+    args = get_hardcoded_args()
     logging.basicConfig(level=getattr(logging, args.log_level), format='[%(levelname)s] %(message)s')
     return process_folder(args)
 
