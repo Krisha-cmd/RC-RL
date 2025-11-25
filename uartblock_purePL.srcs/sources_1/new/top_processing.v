@@ -73,7 +73,7 @@ module top_processing #(
         .rx_byte_valid(rx_byte_valid)
     );
 
-    // TX instance we fixed earlier (exposes tx_busy)
+    // TX instance (exposes tx_busy)
     reg tx_start_reg;
     reg [7:0] tx_data_reg;
     wire tx_busy;
@@ -90,25 +90,9 @@ module top_processing #(
         .tx_busy(tx_busy)
     );
 
-
-
-    // show rx activity when rx_byte_valid pulses (stretch for visibility)
-    reg [15:0] rx_act_cnt;
-    always @(posedge clk) begin
-        if (rst) rx_act_cnt <= 16'h0;
-        else if (rx_byte_valid) rx_act_cnt <= 16'hFFFF;
-        else if (rx_act_cnt != 0) rx_act_cnt <= rx_act_cnt - 1;
-    end
-    assign led_rx_activity = |rx_act_cnt;
-
-    // show tx activity when tx_start_reg pulses (stretch)
-    reg [15:0] tx_act_cnt;
-    always @(posedge clk) begin
-        if (rst) tx_act_cnt <= 16'h0;
-        else if (tx_start_reg) tx_act_cnt <= 16'hFFFF;
-        else if (tx_act_cnt != 0) tx_act_cnt <= tx_act_cnt - 1;
-    end
-    assign led_tx_activity = |tx_act_cnt;
+    // LEDs reflect current activity/state
+    assign led_rx_activity = rx_byte_valid;
+    assign led_tx_activity = tx_busy;
 
     // ------------------------------------------------------------------------
     // FIFO1: RX bytes -> assembler1 (single-clock BRAM FIFO)
@@ -142,7 +126,7 @@ module top_processing #(
     // ------------------------------------------------------------------------
     wire [CHANNELS*PIXEL_WIDTH-1:0] pixel1;
     wire pixel1_valid;
-    reg  pixel1_ready;
+    wire pixel1_ready;
 
     pixel_assembler #(.PIXEL_WIDTH(PIXEL_WIDTH), .CHANNELS(CHANNELS)) assembler1 (
         .clk(clk),
@@ -155,61 +139,21 @@ module top_processing #(
         .pixel_ready(pixel1_ready)
     );
 
-    // ------------------------------------------------------------------------
-    // RL agent + clock_module (both single-clock)
-    // ------------------------------------------------------------------------
-    wire rl_valid;
-    wire [1:0] rl_core_mask;
-    wire [7:0] rl_freq_code;
-
-    rl_agent_simple #(.INTERVAL(100000)) rl_inst (
-        .clk(clk),
-        .rst(rst),
-        .rl_valid(rl_valid),
-        .core_mask(rl_core_mask),
-        .freq_code(rl_freq_code)
-    );
-
-    wire ce_resizer;
-    wire ce_grayscale;
-    wire [7:0] divider_resizer;
-    wire [7:0] divider_grayscale;
-
-    clock_module_simple clkmod_inst (
-        .clk(clk),
-        .rst(rst),
-        .rl_valid(rl_valid),
-        .core_mask(rl_core_mask),
-        .freq_code(rl_freq_code),
-        .ce_resizer(ce_resizer),
-        .ce_grayscale(ce_grayscale),
-        .divider_resizer(divider_resizer),
-        .divider_grayscale(divider_grayscale)
-    );
+    // No RL/clock gating; simple valid-driven flow
 
     // ------------------------------------------------------------------------
-    // Resizer (CE gated) - we gate the read pulse; resizer works on same clk
+    // Resizer (single clock) – read when input pixel is valid
     // ------------------------------------------------------------------------
     wire [CHANNELS*PIXEL_WIDTH-1:0] res_out_pixel;
     wire                            res_valid;
     wire                            res_frame_done;
     wire                            resizer_state;
 
-    // stretch resizer busy for LED
-    reg [15:0] res_busy_cnt;
+    // assembler1 always ready
+    assign pixel1_ready = 1'b1;
 
-    // keep assembler1 ready = 1 (simple flow control)
-    always @(posedge clk) begin
-        if (rst) pixel1_ready <= 1'b1;
-        else      pixel1_ready <= 1'b1;
-    end
-
-    // read pulse for resizer is CE && pixel available
-    reg resizer_read_pulse;
-    always @(posedge clk) begin
-        if (rst) resizer_read_pulse <= 1'b0;
-        else     resizer_read_pulse <= ce_resizer & pixel1_valid & pixel1_ready;
-    end
+    // read pulse when pixel available
+    wire resizer_read_pulse = pixel1_valid & pixel1_ready;
 
     resizer_core #(
         .IN_WIDTH(IN_WIDTH),
@@ -229,13 +173,8 @@ module top_processing #(
         .state(resizer_state)
     );
 
-    // stretch for LED visibility
-    always @(posedge clk) begin
-        if (rst) res_busy_cnt <= 16'h0;
-        else if (resizer_state) res_busy_cnt <= 16'hFFFF;
-        else if (res_busy_cnt != 0) res_busy_cnt <= res_busy_cnt - 1;
-    end
-    assign led_resizer_busy = |res_busy_cnt;
+    // LED shows resizer core state directly
+    assign led_resizer_busy = resizer_state;
 
     // ------------------------------------------------------------------------
     // Pixel Splitter -> FIFO2 (single-clock)
@@ -260,7 +199,7 @@ module top_processing #(
     wire fifo2_rd_valid;
     wire [7:0] fifo2_rd_data;
     wire [2:0] fifo2_load_bucket;
-    reg  pixel2_ready;
+    wire pixel2_ready;
     bram_fifo #(.DEPTH(FIFO2_DEPTH), .ADDR_WIDTH(ADDR_W_FIFO2)) fifo2 (
         .wr_clk(clk),
         .wr_rst_n(rst),
@@ -299,22 +238,17 @@ module top_processing #(
         .pixel_ready(pixel2_ready)
     );
 
-    // For simplicity keep assembler2 ready = 1
-    always @(posedge clk) begin
-        if (rst) pixel2_ready <= 1'b1;
-        else     pixel2_ready <= 1'b1;
-    end
+    // assembler2 always ready
+    assign pixel2_ready = 1'b1;
 
     // ------------------------------------------------------------------------
-    // Grayscale CE gating (same clock)
+    // Grayscale – read when input pixel is valid
     // ------------------------------------------------------------------------
-    reg gray_read_pulse;
-    reg [15:0] gray_busy_cnt;
+    wire gray_read_pulse = pixel2_valid & pixel2_ready;
 
-    always @(posedge clk) begin
-        if (rst) gray_read_pulse <= 1'b0;
-        else     gray_read_pulse <= ce_grayscale & pixel2_valid & pixel2_ready;
-    end
+    // grayscale outputs
+    wire [7:0] gray_byte;
+    wire       gray_valid;
 
     grayscale_core #(
         .IMG_WIDTH(OUT_WIDTH),
@@ -325,18 +259,11 @@ module top_processing #(
         .rst_n(rst),
         .data_in(pixel2),
         .read_signal(gray_read_pulse),
-        .data_out(gray_byte),         // expected to drive FIFO3 writer if present
-        .write_signal(gray_valid),     // expected to indicate data_out validity
+        .data_out(gray_byte),
+        .write_signal(gray_valid),
         .state(led_gray_busy)
     );
 
-    // stretch grayscale busy for LED
-    always @(posedge clk) begin
-        if (rst) gray_busy_cnt <= 16'h0;
-        else if (gray_read_pulse) gray_busy_cnt <= 16'hFFFF;
-        else if (gray_busy_cnt != 0) gray_busy_cnt <= gray_busy_cnt - 1;
-    end
-    
 
     // ------------------------------------------------------------------------
     // FIFO3: grayscale bytes -> TX (single-clock)
@@ -345,12 +272,6 @@ module top_processing #(
     wire fifo3_rd_valid;
     wire [7:0] fifo3_rd_data;
     wire [2:0] fifo3_load_bucket;
-
-    // For safety set gray outputs to zero (user should connect actual grayscale outputs)
-    wire [7:0] gray_byte;
-    wire       gray_valid;
-    assign gray_byte = 8'h00;
-    assign gray_valid = 1'b0;
 
     bram_fifo #(.DEPTH(FIFO3_DEPTH), .ADDR_WIDTH(ADDR_W_FIFO3)) fifo3 (
         .wr_clk(clk),
@@ -362,7 +283,7 @@ module top_processing #(
         .rd_clk(clk),
         .rd_rst_n(rst),
         .rd_valid(fifo3_rd_valid),
-        .rd_ready(tx_start_reg),           // drive via fifo3_rd_ready_reg below
+        .rd_ready(fifo3_rd_ready_reg),
         .rd_data(fifo3_rd_data),
 
         .wr_count_sync(), .rd_count_sync(),
@@ -370,152 +291,27 @@ module top_processing #(
     );
 
     // ------------------------------------------------------------------------
-    // Logger (synchronous BRAM)
+    // TX: stream bytes from FIFO3 to UART TX when ready
     // ------------------------------------------------------------------------
-    wire logger_rd_valid;
-    wire [15:0] logger_rd_data;
-    wire logger_rd_done;
-    reg  logger_rd_en;
-
-    logger_simple #(
-        .INTERVAL_CYCLES(LOGGER_INTERVAL),
-        .ENTRY_WIDTH(16),
-        .LOGGER_DEPTH(LOGGER_DEPTH)
-    ) logger_inst (
-        .clk(clk),
-        .rst(rst),
-        .fifo1_load_bucket(fifo1_load_bucket),
-        .fifo2_load_bucket(fifo2_load_bucket),
-        .resizer_state(resizer_state),
-        .gray_state(|gray_busy_cnt),
-        .divider_resizer(divider_resizer),
-        .divider_grayscale(divider_grayscale),
-        .start_logging(1'b1),
-        .stop_logging(1'b0),
-        .rd_en(logger_rd_en),
-        .rd_valid(logger_rd_valid),
-        .rd_data(logger_rd_data),
-        .rd_done(logger_rd_done)
-    );
-
-    // ------------------------------------------------------------------------
-    // TX FSM (single-clock). Consumes fifo3_rd_valid and sends bytes via tx_inst.
-    // Also sends markers "/0/0" and then flushes logger contents (logger_inst read)
-    // ------------------------------------------------------------------------
-
-    // FSM state encodings (Verilog-2001)
-    localparam S_IDLE     = 4'd0;
-    localparam S_STREAM   = 4'd1;
-
-    localparam S_MARK1_0  = 4'd2;
-    localparam S_MARK1_1  = 4'd3;
-    localparam S_MARK1_2  = 4'd4;
-    localparam S_MARK1_3  = 4'd5;
-
-    localparam S_LOG_REQ  = 4'd6;
-    localparam S_LOG_RD   = 4'd7;
-    localparam S_LOG_MSB  = 4'd8;
-    localparam S_LOG_LSB  = 4'd9;
-
-    localparam S_MARK2_0  = 4'd10;
-    localparam S_MARK2_1  = 4'd11;
-    localparam S_MARK2_2  = 4'd12;
-    localparam S_MARK2_3  = 4'd13;
-
-    reg [3:0] tx_state;
     reg fifo3_rd_ready_reg;
-    reg [7:0] fifo3_latched;
-    reg fifo3_latched_valid;
-    reg [15:0] logger_latched;
-    reg logger_pending;
 
-    // remove any initial block: initialize on reset below
-
-    // connect FIFO3 rd_ready externally: instruct user to connect .rd_ready to fifo3_rd_ready_reg
-    // (In this top we will use fifo3_rd_ready_reg as the control signal when reading fifo3.)
-
-    // TX FSM sequential logic
     always @(posedge clk) begin
         if (rst) begin
-            tx_state <= S_IDLE;
             tx_start_reg <= 1'b0;
             tx_data_reg <= 8'h00;
             fifo3_rd_ready_reg <= 1'b0;
-            fifo3_latched <= 8'h00;
-            fifo3_latched_valid <= 1'b0;
-            logger_rd_en <= 1'b0;
-            logger_latched <= 16'h0000;
-            logger_pending <= 1'b0;
         end else begin
             // defaults each clock
             tx_start_reg <= 1'b0;
             fifo3_rd_ready_reg <= 1'b0;
-            logger_rd_en <= 1'b0;
 
-            case (tx_state)
-                S_IDLE: begin
-                    if (fifo3_rd_valid) begin
-                        fifo3_rd_ready_reg <= 1'b1; // ask FIFO for byte (sync on same clk)
-                        tx_state <= S_STREAM;
-                    end
-                end
-
-                S_STREAM: begin
-                    if (fifo3_rd_valid && !fifo3_latched_valid) begin
-                        fifo3_latched <= fifo3_rd_data;
-                        fifo3_latched_valid <= 1'b1;
-                    end
-                    if (fifo3_latched_valid && !tx_busy) begin
-                        tx_data_reg <= fifo3_latched;
-                        tx_start_reg <= 1'b1;
-                        fifo3_latched_valid <= 1'b0;
-                    end
-                    // if FIFO empty and no in-flight byte, finish streaming
-                    if (!fifo3_rd_valid && !fifo3_latched_valid) begin
-                        tx_state <= S_MARK1_0;
-                    end
-                end
-
-                // send "/0/0"
-                S_MARK1_0: if (!tx_busy) begin tx_data_reg<=8'h2F; tx_start_reg<=1'b1; tx_state<=S_MARK1_1; end
-                S_MARK1_1: if (!tx_busy) begin tx_data_reg<=8'h30; tx_start_reg<=1'b1; tx_state<=S_MARK1_2; end
-                S_MARK1_2: if (!tx_busy) begin tx_data_reg<=8'h2F; tx_start_reg<=1'b1; tx_state<=S_MARK1_3; end
-                S_MARK1_3: if (!tx_busy) begin tx_data_reg<=8'h30; tx_start_reg<=1'b1; tx_state<=S_LOG_REQ; end
-
-                // request logger read until done
-                S_LOG_REQ: begin
-                    if (!logger_rd_done) begin
-                        logger_rd_en <= 1'b1; // logger will present rd_data in this same clock (synchronous)
-                        tx_state <= S_LOG_RD;
-                    end else begin
-                        tx_state <= S_MARK2_0;
-                    end
-                end
-
-                S_LOG_RD: begin
-                    if (logger_rd_valid) begin
-                        logger_latched <= logger_rd_data;
-                        logger_pending <= 1'b1;
-                        tx_state <= S_LOG_MSB;
-                    end
-                end
-
-                S_LOG_MSB: if (logger_pending && !tx_busy) begin tx_data_reg <= logger_latched[15:8]; tx_start_reg <= 1'b1; tx_state <= S_LOG_LSB; end
-                S_LOG_LSB: if (!tx_busy) begin tx_data_reg <= logger_latched[7:0]; tx_start_reg <= 1'b1; logger_pending<=1'b0; tx_state <= S_LOG_REQ; end
-
-                // trailing marker
-                S_MARK2_0: if (!tx_busy) begin tx_data_reg<=8'h2F; tx_start_reg<=1'b1; tx_state<=S_MARK2_1; end
-                S_MARK2_1: if (!tx_busy) begin tx_data_reg<=8'h30; tx_start_reg<=1'b1; tx_state<=S_MARK2_2; end
-                S_MARK2_2: if (!tx_busy) begin tx_data_reg<=8'h2F; tx_start_reg<=1'b1; tx_state<=S_MARK2_3; end
-                S_MARK2_3: if (!tx_busy) begin tx_data_reg<=8'h30; tx_start_reg<=1'b1; tx_state<=S_IDLE; end
-
-                default: tx_state <= S_IDLE;
-            endcase
+            if (!tx_busy && fifo3_rd_valid) begin
+                tx_data_reg <= fifo3_rd_data;
+                tx_start_reg <= 1'b1;
+                fifo3_rd_ready_reg <= 1'b1;
+            end
         end
     end
-
-    // IMPORTANT: connect the fifo3 rd_ready port of your bram_fifo instance to fifo3_rd_ready_reg
-    // In case the bram_fifo instantiation in your project is fixed, update its .rd_ready(...) binding accordingly.
 
     // ------------------------------------------------------------------------
     // Expose some signals for LEDs or external observation
