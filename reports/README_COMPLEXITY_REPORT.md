@@ -46,15 +46,19 @@ This project implements a complete image processing pipeline on an FPGA with an 
                     │                                                                     │
                     │  ┌────────────────────────────────────────────────────────────┐   │
                     │  │                    CONTROL SUBSYSTEM                        │   │
+                    │  │                                                             │   │
+                    │  │  FIFO loads ───────┐                                        │   │
+                    │  │  (fifo1,2,3_load)  │                                        │   │
+                    │  │                    ▼                                        │   │
                     │  │  ┌────────────┐    ┌─────────────┐    ┌──────────────────┐ │   │
                     │  │  │ RL Q-LEARN │───▶│ CLOCK AGENT │───▶│ clk_en[3:0]      │ │   │
                     │  │  │   AGENT    │    │             │    │ (to all cores)    │ │   │
                     │  │  └────────────┘    └─────────────┘    └──────────────────┘ │   │
-                    │  │         ▲                                                   │   │
-                    │  │         │  FIFO load feedback                              │   │
-                    │  │  ┌──────┴───────────────────────────────────────────────┐  │   │
-                    │  │  │           PERFORMANCE LOGGER                          │  │   │
-                    │  │  │  (captures state, transmits via UART after image)     │  │   │
+                    │  │                                                             │   │
+                    │  │  ┌───────────────────────────────────────────────────────┐  │   │
+                    │  │  │           PERFORMANCE LOGGER (read-only observer)      │  │   │
+                    │  │  │  (captures state, transmits via UART after image)      │  │   │
+                    │  │  │  NOTE: Does NOT feed back to RL agent                  │  │   │
                     │  │  └───────────────────────────────────────────────────────┘  │   │
                     │  └────────────────────────────────────────────────────────────┘   │
                     └─────────────────────────────────────────────────────────────────────┘
