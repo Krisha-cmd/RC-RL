@@ -14,7 +14,7 @@ module pixel_assembler #(
     output reg  pixel_valid,
     input  wire pixel_ready       // downstream ready to accept pixel
 );
-    reg [1:0] state;
+    reg [2:0] state;
     reg [7:0] b0, b1, b2;
 
     always @(posedge clk or posedge rst) begin
@@ -28,44 +28,61 @@ module pixel_assembler #(
             pixel_valid <= 0;
             bram_rd_ready <= 0;
             case (state)
-                2'd0: begin
-                    // start if a byte is available
+                3'd0: begin
+                    // Request first byte
                     if (bram_rd_valid) begin
-                        bram_rd_ready <= 1'b1; // consume byte0 this cycle
-                        state <= 2'd1;
+                        bram_rd_ready <= 1'b1;
+                        state <= 3'd1;
                     end
                 end
-                2'd1: begin
-                    // in next cycle bram_rd_data holds byte0
+                3'd1: begin
+                    // Wait 1 cycle for BRAM read latency (BRAM output updates this cycle)
+                    state <= 3'd2;
+                end
+                3'd2: begin
+                    // Latch first byte (valid now after BRAM latency)
                     b0 <= bram_rd_data;
-                    // request byte1
+                    // Request second byte
                     if (bram_rd_valid) begin
                         bram_rd_ready <= 1'b1;
-                        state <= 2'd2;
-                    end else state <= 2'd1;
+                        state <= 3'd3;
+                    end else begin
+                        state <= 3'd2;
+                    end
                 end
-                2'd2: begin
+                3'd3: begin
+                    // Wait for BRAM
+                    state <= 3'd4;
+                end
+                3'd4: begin
+                    // Latch second byte
                     b1 <= bram_rd_data;
+                    // Request third byte
                     if (bram_rd_valid) begin
                         bram_rd_ready <= 1'b1;
-                        state <= 2'd3;
-                    end else state <= 2'd2;
+                        state <= 3'd5;
+                    end else begin
+                        state <= 3'd4;
+                    end
                 end
-                2'd3: begin
+                3'd5: begin
+                    // Wait for BRAM
+                    state <= 3'd6;
+                end
+                3'd6: begin
+                    // Latch third byte and output pixel
                     b2 <= bram_rd_data;
-                    // assembled pixel; only output if downstream ready
                     if (pixel_ready) begin
                         pixel_out <= {b0, b1, bram_rd_data}; // {R,G,B}
                         pixel_valid <= 1'b1;
-                        state <= 2'd0;
+                        state <= 3'd0;
                     end else begin
-                        // hold assembled bytes until downstream ready;
-                        // do not consume further bytes (we already consumed all 3)
-                        // We'll present pixel_valid next cycle when pixel_ready.
+                        // Wait for downstream to be ready
                         pixel_out <= {b0, b1, bram_rd_data};
-                        state <= 2'd3;
+                        state <= 3'd6;
                     end
                 end
+                default: state <= 3'd0;
             endcase
         end
     end

@@ -27,6 +27,8 @@ module top_processing #(
     parameter integer LOGGER_DEPTH    = 4096,
     // If set to 1, logger records continuously (useful for debugging)
     parameter integer LOG_ALWAYS      = 1
+    // Enable debug bypass: when 1, send grayscale bytes directly to TX (bypass FIFO3 + FSM)
+    ,parameter integer DEBUG_BYPASS_TX = 1
 )(
     input  wire clk,          // map this to Y9 on ZedBoard (100MHz)
     input  wire rst,          
@@ -39,71 +41,12 @@ module top_processing #(
     output wire led_resizer_busy,
     output wire led_gray_busy
 );
-
-    // ------------------------------------------------------------------------
-    // small utility: compile-time clog2 (Verilog-2001 style)
-    // ------------------------------------------------------------------------
-    function integer clog2;
-        input integer value;
-        integer v;
-        begin
-            v = value - 1;
-            clog2 = 0;
-            while (v > 0) begin
-                clog2 = clog2 + 1;
-                v = v >> 1;
-            end
-        end
-    endfunction
-
-    // compute address widths using clog2
-    localparam integer ADDR_W_FIFO1 = clog2(FIFO1_DEPTH);
-    localparam integer ADDR_W_FIFO2 = clog2(FIFO2_DEPTH);
-    localparam integer ADDR_W_FIFO3 = clog2(FIFO3_DEPTH);
-
-    // ------------------------------------------------------------------------
-    // UART rx/tx (single clock domain)
-    // ------------------------------------------------------------------------
-    wire [7:0] rx_byte;
-    wire       rx_byte_valid;
-
-    rx rx_inst (
-        .clk(clk),
-        .rst(rst),
-        .rx(uart_rx),
-        .rx_byte(rx_byte),
-        .rx_byte_valid(rx_byte_valid)
-    );
-
-    // TX instance (exposes tx_busy)
-    reg tx_start_reg;
-    reg [7:0] tx_data_reg;
-    wire tx_busy;
-
-    tx #(
-        .CLOCK_FREQ(100_000_000),
-        .BAUD_RATE(115200)
-    ) tx_inst (
-        .clk(clk),
-        .rst(rst),
-        .tx(uart_tx),
-        .tx_start(tx_start_reg),
-        .tx_data(tx_data_reg),
-        .tx_busy(tx_busy)
-    );
-
-    // LEDs reflect current activity/state
-    // LED pulse stretchers so short pulses are visible on LEDs
-    localparam integer LED_PULSE_CYCLES = 500000; // ~5ms at 100MHz
-    reg [22:0] rx_led_cnt;
-    reg [22:0] tx_led_cnt;
-    reg led_rx_r;
-    reg led_tx_r;
-    reg tx_busy_prev;
-    reg [22:0] resizer_led_cnt;
     reg [22:0] gray_led_cnt;
     reg led_resizer_r;
     reg led_gray_r;
+    reg rx_led_cnt;
+    reg led_rx_r;
+    reg LED_PULSE_CYCLES;
 
     // stretch RX pulse
     always @(posedge clk) begin
@@ -226,7 +169,7 @@ module top_processing #(
     wire [CHANNELS*PIXEL_WIDTH-1:0] res_out_pixel;
     wire                            res_valid;
     wire                            res_frame_done;
-    wire                            resizer_state;
+    
     wire                            gray_state_wire;
 
     // RL / clock wires (allow RL agent to change core pacing)
@@ -525,199 +468,4 @@ module top_processing #(
 endmodule
 
 
-// =================================================================================
-// Small helper modules (Verilog-2001 compatible): rl_agent_simple, clock_module_simple, logger_simple
-// =================================================================================
-
-// --------------------------------------------
-// rl_agent_simple
-// small FSM that periodically issues a freq command
-// --------------------------------------------
-module rl_agent_simple #(
-    parameter integer INTERVAL = 2000000
-)(
-    input  wire clk,
-    input  wire rst,            // active-high
-    output reg  rl_valid,
-    output reg [1:0] core_mask,
-    output reg [7:0] freq_code
-);
-    reg [31:0] cnt;
-    // no typedefs; simple registers
-    always @(posedge clk) begin
-        if (rst) begin
-            cnt <= 32'h0;
-            rl_valid <= 1'b0;
-            core_mask <= 2'b01;
-            freq_code <= 8'd4;
-        end else begin
-            rl_valid <= 1'b0;
-            if (cnt >= INTERVAL - 1) begin
-                cnt <= 32'h0;
-                rl_valid <= 1'b1;
-                if (core_mask == 2'b01) core_mask <= 2'b10;
-                else core_mask <= 2'b01;
-                freq_code <= freq_code + 1;
-            end else begin
-                cnt <= cnt + 1;
-            end
-        end
-    end
-endmodule
-
-
-// --------------------------------------------
-// clock_module_simple
-// Accepts rl commands and exposes two divider registers and generates CE pulses
-// --------------------------------------------
-module clock_module_simple (
-    input  wire clk,
-    input  wire rst,
-    input  wire rl_valid,
-    input  wire [1:0] core_mask,
-    input  wire [7:0] freq_code,
-    output reg ce_resizer,
-    output reg ce_grayscale,
-    output reg [7:0] divider_resizer,
-    output reg [7:0] divider_grayscale
-);
-    reg [31:0] cnt_resizer, cnt_gray;
-
-    // map_code_to_div written in Verilog-2001 function style
-    function [7:0] map_code_to_div;
-        input [7:0] code;
-        begin
-            map_code_to_div = (code % 250) + 1; // 1..250
-        end
-    endfunction
-
-    always @(posedge clk) begin
-        if (rst) begin
-            divider_resizer <= 8'd10;
-            divider_grayscale <= 8'd20;
-            cnt_resizer <= 32'h0;
-            cnt_gray <= 32'h0;
-            ce_resizer <= 1'b0;
-            ce_grayscale <= 1'b0;
-        end else begin
-            ce_resizer <= 1'b0;
-            ce_grayscale <= 1'b0;
-
-            // apply RL update when requested
-            if (rl_valid) begin
-                if (core_mask[0]) divider_resizer <= map_code_to_div(freq_code);
-                if (core_mask[1]) divider_grayscale <= map_code_to_div(freq_code);
-            end
-
-            // resizer CE generation
-            if (cnt_resizer >= divider_resizer - 1) begin
-                cnt_resizer <= 32'h0;
-                ce_resizer <= 1'b1;
-            end else begin
-                cnt_resizer <= cnt_resizer + 1;
-            end
-
-            // grayscale CE generation
-            if (cnt_gray >= divider_grayscale - 1) begin
-                cnt_gray <= 32'h0;
-                ce_grayscale <= 1'b1;
-            end else begin
-                cnt_gray <= cnt_gray + 1;
-            end
-        end
-    end
-endmodule
-
-
-// --------------------------------------------
-// logger_simple
-// Synchronously stores small packed entries every INTERVAL_CYCLES into an internal BRAM.
-// Read side: rd_en pulses to read next 16-bit word; rd_valid presented same cycle.
-// rd_done asserted when read pointer catches up with write pointer.
-// --------------------------------------------
-module logger_simple #(
-    parameter integer INTERVAL_CYCLES = 20,
-    parameter integer ENTRY_WIDTH     = 16,
-    parameter integer LOGGER_DEPTH    = 4096
-)(
-    input  wire clk,
-    input  wire rst,
-    input  wire [2:0] fifo1_load_bucket,
-    input  wire [2:0] fifo2_load_bucket,
-    input  wire resizer_state,
-    input  wire gray_state,
-    input  wire [7:0] divider_resizer,
-    input  wire [7:0] divider_grayscale,
-    input  wire start_logging,
-    input  wire stop_logging,
-    input  wire rd_en,
-    output reg rd_valid,
-    output reg [15:0] rd_data,
-    output wire rd_done
-);
-    // compute address width for the internal memory
-    function integer clog2_local;
-        input integer value;
-        integer v;
-        begin
-            v = value - 1;
-            clog2_local = 0;
-            while (v > 0) begin
-                clog2_local = clog2_local + 1;
-                v = v >> 1;
-            end
-        end
-    endfunction
-
-    localparam integer ADDR_WIDTH = clog2_local(LOGGER_DEPTH);
-
-    // internal memory
-    reg [ENTRY_WIDTH-1:0] mem [0:LOGGER_DEPTH-1];
-    reg [ADDR_WIDTH-1:0] wr_ptr;
-    reg [ADDR_WIDTH-1:0] rd_ptr;
-    reg [15:0] cycle_cnt;
-    reg logging_active;
-
-    assign rd_done = (rd_ptr == wr_ptr);
-
-    // write (synchronous)
-    always @(posedge clk) begin
-        if (rst) begin
-            wr_ptr <= {ADDR_WIDTH{1'b0}};
-            cycle_cnt <= 16'h0;
-            logging_active <= 1'b0;
-        end else begin
-            if (start_logging) logging_active <= 1'b1;
-            if (stop_logging)  logging_active <= 1'b0;
-
-            if (!logging_active) cycle_cnt <= 16'h0;
-            else begin
-                if (cycle_cnt < INTERVAL_CYCLES - 1) cycle_cnt <= cycle_cnt + 1;
-                else begin
-                    cycle_cnt <= 16'h0;
-                    // PACK ENTRY (16 bits)
-                    // bits: [15:13]=fifo1, [12:10]=fifo2, [9]=resizer, [8]=gray, [7:0]=divider_resizer (LSB)
-                    mem[wr_ptr] <= { fifo1_load_bucket, fifo2_load_bucket, resizer_state, gray_state, divider_resizer };
-                    wr_ptr <= wr_ptr + 1;
-                end
-            end
-        end
-    end
-
-    // read logic (synchronous): rd_en -> rd_data and rd_valid presented same cycle
-    always @(posedge clk) begin
-        if (rst) begin
-            rd_ptr <= {ADDR_WIDTH{1'b0}};
-            rd_data <= 16'h0;
-            rd_valid <= 1'b0;
-        end else begin
-            rd_valid <= 1'b0;
-            if (rd_en && (rd_ptr != wr_ptr)) begin
-                rd_data <= mem[rd_ptr];
-                rd_ptr <= rd_ptr + 1;
-                rd_valid <= 1'b1;
-            end
-        end
-    end
-
-endmodule
+// helper modules are provided as separate files in sources_1/new

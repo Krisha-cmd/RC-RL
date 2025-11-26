@@ -7,3 +7,9 @@ id,input_name,bytes_sent,bytes_received,duration_s,output_image_path,mode,succes
 2,sample.jpeg,49152,4096,14.337062,output\sample_2.jpeg,length,True,2025-11-26T09:57:14,
 2,sample.jpeg,49152,4096,14.34052,output\sample_2.jpeg,length,True,2025-11-26T09:58:13,
 2,sample.jpeg,49152,0,7.816589,,length,False,2025-11-26T11:16:23
+2,sample.jpeg,49152,4096,14.411066,output\sample_2.jpeg,length,True,2025-11-26T13:09:04,
+2,sample.jpeg,49152,4096,14.402651,output\sample_2.jpeg,length,True,2025-11-26T13:19:42,
+2,sample.jpeg,49152,379,34.386645,output\sample_2.jpeg,length,True,2025-11-26T13:37:48,
+2,sample.jpeg,49152,125,34.370852,output\sample_2.jpeg,length,True,2025-11-26T13:50:11,
+2,sample.jpeg,49152,798,34.354698,output\sample_2.jpeg,length,True,2025-11-26T14:04:19,
+2,sample.jpeg,49152,4096,14.455889,output\sample_2.jpeg,length,True,2025-11-26T14:55:45,

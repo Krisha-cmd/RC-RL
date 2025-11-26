@@ -237,8 +237,12 @@ def process_folder(args):
                     if getattr(args, 'out_width', None) and getattr(args, 'out_height', None):
                         expected = int(args.out_width) * int(args.out_height)
                     resp = sender.send_with_length(payload, args.read_timeout, expected_len=expected)
+                    print("Response length:", len(resp))
+                    print("First 64 bytes:", resp[:64])
                 else:
                     resp = sender.send_with_sentinel(payload, args.sentinel, args.read_timeout)
+                    print("Response length:", len(resp))
+                    print("First 64 bytes:", resp[:64])
                 # Prepare output naming
                 base = img_path.stem
                 out_img_name = f"{base}_{idx}{img_path.suffix}" if img_path.suffix else f"{base}_{idx}.bin"
