@@ -12,6 +12,14 @@ module clock_agent #(
     input  wire clk,
     input  wire rst,
     
+    // RL Agent Control
+    input  wire rl_enable,                     // Enable RL agent control
+    input  wire [MAX_DIV_BITS-1:0] rl_core0_div,
+    input  wire [MAX_DIV_BITS-1:0] rl_core1_div,
+    input  wire [MAX_DIV_BITS-1:0] rl_core2_div,
+    input  wire [MAX_DIV_BITS-1:0] rl_core3_div,
+    input  wire rl_update_valid,
+    
     // Core activity signals (1 = busy, 0 = idle)
     input  wire [NUM_CORES-1:0] core_busy,
     
@@ -28,6 +36,10 @@ module clock_agent #(
     output wire [MAX_DIV_BITS-1:0] core1_divider,
     output wire [MAX_DIV_BITS-1:0] core2_divider,
     output wire [MAX_DIV_BITS-1:0] core3_divider,
+    
+    // Performance feedback to RL agent
+    output reg core_stall,
+    output reg throughput_good,
     
     // Statistics outputs
     output reg  [31:0] total_decisions,
@@ -75,6 +87,8 @@ module clock_agent #(
             interval_counter <= 0;
             total_decisions <= 0;
             clock_cycles_saved <= 0;
+            core_stall <= 0;
+            throughput_good <= 1;
             
             for (i = 0; i < NUM_CORES; i = i + 1) begin
                 core_clk_en[i] <= 1'b1;
@@ -85,83 +99,18 @@ module clock_agent #(
                 new_dividers[i] <= 0;
             end
         end else begin
-            // TEMPORARY: Force all cores to full speed until RL agent is ready
-            // This ensures no bytes are dropped during processing
-            for (i = 0; i < NUM_CORES; i = i + 1) begin
-                core_clk_en[i] <= 1'b1;  // Always enabled
-            end
+            // RL Agent Integration
+            if (rl_enable && rl_update_valid) begin
+                // Apply RL agent decisions
             
-            /* DISABLED: Dynamic clock divider logic
-            // Generate clock enables based on current dividers
-            for (i = 0; i < NUM_CORES; i = i + 1) begin
-                if (core_dividers[i] == 0) begin
-                    // No division - always enabled
-                    core_clk_en[i] <= 1'b1;
-                end else begin
-                    // Clock divider logic
-                    if (div_counters[i] >= core_dividers[i]) begin
-                        div_counters[i] <= 0;
-                        core_clk_en[i] <= 1'b1;
-                    end else begin
-                        div_counters[i] <= div_counters[i] + 1;
-                        core_clk_en[i] <= 1'b0;
-                        clock_cycles_saved <= clock_cycles_saved + 1;
-                    end
-                end
-            end
-            */
-            
-            // Track activity
+            // Track activity for statistics
             for (i = 0; i < NUM_CORES; i = i + 1) begin
                 if (core_busy[i]) begin
                     core_active_cycles[i] <= core_active_cycles[i] + 1;
                 end else begin
                     core_idle_cycles[i] <= core_idle_cycles[i] + 1;
                 end
-            end
-            
-            /* DISABLED: FSM decision making - keeping cores at full speed
-            // FSM for decision making
-            case (state)
-                STATE_MONITOR: begin
-                    interval_counter <= interval_counter + 1;
-                    if (interval_counter >= UPDATE_INTERVAL - 1) begin
-                        interval_counter <= 0;
-                        state <= STATE_ANALYZE;
-                    end
-                end
-                
-                STATE_ANALYZE: begin
-                    // Analyze performance metrics
-                    // This is where RL agent will read state in the future
-                    state <= STATE_DECIDE;
-                end
-                
-                STATE_DECIDE: begin
-                    // FSM PLACEHOLDER: Simple heuristic-based decisions
-                    // This entire section will be replaced by RL agent logic
-                    
-                    // Resizer: Keep at full speed if FIFO1 is filling up
-                    if (fifo1_load >= 6) begin
-                        new_dividers[CORE_RESIZER] <= 0;  // Full speed
-                    end else if (fifo1_load <= 2 && core_idle_cycles[CORE_RESIZER] > core_active_cycles[CORE_RESIZER]) begin
-                        new_dividers[CORE_RESIZER] <= 2;  // Slow down
-                    end else begin
-                        new_dividers[CORE_RESIZER] <= core_dividers[CORE_RESIZER];  // Keep current
-                    end
-                    
-                    // Grayscale: Adapt based on FIFO2 and activity
-                    if (fifo2_load >= 6) begin
-                        new_dividers[CORE_GRAY] <= 0;  // Full speed
-                    end else if (fifo2_load <= 2) begin
-                        new_dividers[CORE_GRAY] <= 1;  // Half speed
-                    end else begin
-                        new_dividers[CORE_GRAY] <= core_dividers[CORE_GRAY];
-                    end
-                    
-                    // Diff Amp: Usually can run slower as it's fast
-                    if (fifo3_load >= 6) begin
-                        new_dividers[CORE_DIFFAMP] <= 0;  // Full speed
+            end          new_dividers[CORE_DIFFAMP] <= 0;  // Full speed
                     end else begin
                         new_dividers[CORE_DIFFAMP] <= 1;  // Half speed (safe)
                     end

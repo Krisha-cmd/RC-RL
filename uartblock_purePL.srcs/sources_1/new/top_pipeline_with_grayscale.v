@@ -17,6 +17,7 @@ module top_pipeline_with_grayscale #(
 )(
     input  wire clk,
     input  wire rst,
+    input  wire rl_enable,           // Enable/disable RL agent (1=enabled, 0=full speed)
     input  wire uart_rx,
     output wire uart_tx,
     output wire led_rx_activity,
@@ -44,6 +45,47 @@ module top_pipeline_with_grayscale #(
     localparam ADDR_W_FIFO2 = clog2(FIFO2_DEPTH);
     localparam ADDR_W_FIFO3 = clog2(FIFO3_DEPTH);
 
+    // RL Q-Learning Agent (controlled by rl_enable input)
+    // When enabled, learns optimal clock dividers based on FIFO loads
+    // When disabled (rl_enable=0), all cores run at full speed
+    
+    wire [3:0] rl_core0_div, rl_core1_div, rl_core2_div, rl_core3_div;
+    wire rl_update_valid;
+    wire [15:0] rl_total_updates, rl_exploration_count, rl_exploitation_count;
+    wire signed [15:0] rl_avg_reward;
+    wire [8:0] rl_current_state;
+    wire [15:0] rl_current_action;
+    wire core_stall, throughput_good;
+    
+    rl_q_learning_agent #(
+        .NUM_CORES(4),
+        .UPDATE_INTERVAL(1000)  // Update every 1000 cycles
+    ) rl_agent_inst (
+        .clk(clk),
+        .rst(rst),
+        .enable(rl_enable),  // Controlled by input pin
+        .fifo1_load(fifo1_load_bucket),
+        .fifo2_load(fifo2_load_bucket),
+        .fifo3_load(fifo3_load_bucket),
+        .current_core0_div(core0_divider),
+        .current_core1_div(core1_divider),
+        .current_core2_div(core2_divider),
+        .current_core3_div(core3_divider),
+        .rl_core0_div(rl_core0_div),
+        .rl_core1_div(rl_core1_div),
+        .rl_core2_div(rl_core2_div),
+        .rl_core3_div(rl_core3_div),
+        .rl_update_valid(rl_update_valid),
+        .core_stall(core_stall),
+        .throughput_good(throughput_good),
+        .total_updates(rl_total_updates),
+        .exploration_count(rl_exploration_count),
+        .exploitation_count(rl_exploitation_count),
+        .avg_reward(rl_avg_reward),
+        .current_state_out(rl_current_state),
+        .current_action_out(rl_current_action)
+    );
+    
     // Clock Agent - Dynamic clock management for processing cores
     wire [3:0] core_clk_en;  // [resizer, grayscale, diffamp, blur]
     wire [3:0] core_busy_signals;
@@ -56,6 +98,12 @@ module top_pipeline_with_grayscale #(
     ) clock_agent_inst (
         .clk(clk),
         .rst(rst),
+        .rl_enable(rl_enable),  // Pass through input pin
+        .rl_core0_div(rl_core0_div),
+        .rl_core1_div(rl_core1_div),
+        .rl_core2_div(rl_core2_div),
+        .rl_core3_div(rl_core3_div),
+        .rl_update_valid(rl_update_valid),
         .core_busy(core_busy_signals),
         .fifo1_load(fifo1_load_bucket),
         .fifo2_load(fifo2_load_bucket),
@@ -65,6 +113,8 @@ module top_pipeline_with_grayscale #(
         .core1_divider(core1_divider),
         .core2_divider(core2_divider),
         .core3_divider(core3_divider),
+        .core_stall(core_stall),
+        .throughput_good(throughput_good),
         .total_decisions(),
         .clock_cycles_saved()
     );

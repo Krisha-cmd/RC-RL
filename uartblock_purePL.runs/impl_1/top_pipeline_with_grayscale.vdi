@@ -1,17 +1,26 @@
-
-*** Running vivado
-    with args -log top_pipeline_with_grayscale.vdi -applog -m64 -product Vivado -messageDb vivado.pb -mode batch -source top_pipeline_with_grayscale.tcl -notrace
-
-
-
-****** Vivado v2025.1 (64-bit)
-  **** SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
-  **** IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
-  **** SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
-  **** Start of session at: Wed Nov 26 18:40:38 2025
-    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
-    ** Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
-
+#-----------------------------------------------------------
+# Vivado v2025.1 (64-bit)
+# SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
+# IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
+# SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
+# Start of session at: Wed Nov 26 18:40:38 2025
+# Process ID         : 27904
+# Current directory  : C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.runs/impl_1
+# Command line       : vivado.exe -log top_pipeline_with_grayscale.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source top_pipeline_with_grayscale.tcl -notrace
+# Log file           : C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.runs/impl_1/top_pipeline_with_grayscale.vdi
+# Journal file       : C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.runs/impl_1\vivado.jou
+# Running On         : BOOK-JBCPDRK7D5
+# Platform           : Windows Server 2016 or Windows 10
+# Operating System   : 26100
+# Processor Detail   : 13th Gen Intel(R) Core(TM) i7-1360P
+# CPU Frequency      : 2611 MHz
+# CPU Physical cores : 12
+# CPU Logical cores  : 16
+# Host memory        : 16854 MB
+# Swap memory        : 45149 MB
+# Total Virtual      : 62004 MB
+# Available Virtual  : 36383 MB
+#-----------------------------------------------------------
 source top_pipeline_with_grayscale.tcl -notrace
 create_project: Time (s): cpu = 00:00:09 ; elapsed = 00:00:07 . Memory (MB): peak = 483.809 ; gain = 212.488
 Command: link_design -top top_pipeline_with_grayscale -part xc7z020clg484-1
@@ -653,22 +662,35 @@ Wrote Device Cache: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.008 . Memory (
 Write Physdb Complete: Time (s): cpu = 00:00:04 ; elapsed = 00:00:02 . Memory (MB): peak = 2203.824 ; gain = 4.238
 INFO: [Common 17-1381] The checkpoint 'C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.runs/impl_1/top_pipeline_with_grayscale_routed.dcp' has been generated.
 INFO: [Common 17-206] Exiting Vivado at Wed Nov 26 18:42:05 2025...
-
-*** Running vivado
-    with args -log top_pipeline_with_grayscale.vdi -applog -m64 -product Vivado -messageDb vivado.pb -mode batch -source top_pipeline_with_grayscale.tcl -notrace
-
-
-
-****** Vivado v2025.1 (64-bit)
-  **** SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
-  **** IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
-  **** SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
-  **** Start of session at: Wed Nov 26 18:42:24 2025
-    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
-    ** Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
-
+#-----------------------------------------------------------
+# Vivado v2025.1 (64-bit)
+# SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
+# IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
+# SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
+# Start of session at: Wed Nov 26 18:42:24 2025
+# Process ID         : 21796
+# Current directory  : C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.runs/impl_1
+# Command line       : vivado.exe -log top_pipeline_with_grayscale.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source top_pipeline_with_grayscale.tcl -notrace
+# Log file           : C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.runs/impl_1/top_pipeline_with_grayscale.vdi
+# Journal file       : C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.runs/impl_1\vivado.jou
+# Running On         : BOOK-JBCPDRK7D5
+# Platform           : Windows Server 2016 or Windows 10
+# Operating System   : 26100
+# Processor Detail   : 13th Gen Intel(R) Core(TM) i7-1360P
+# CPU Frequency      : 2611 MHz
+# CPU Physical cores : 12
+# CPU Logical cores  : 16
+# Host memory        : 16854 MB
+# Swap memory        : 45149 MB
+# Total Virtual      : 62004 MB
+# Available Virtual  : 36414 MB
+#-----------------------------------------------------------
 source top_pipeline_with_grayscale.tcl -notrace
 Command: open_checkpoint top_pipeline_with_grayscale_routed.dcp
+
+Starting open_checkpoint Task
+
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.032 . Memory (MB): peak = 282.094 ; gain = 0.617
 INFO: [Device 21-403] Loading part xc7z020clg484-1
 Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.030 . Memory (MB): peak = 732.074 ; gain = 0.000
 INFO: [Netlist 29-17] Analyzing 1478 Unisim elements for replacement
