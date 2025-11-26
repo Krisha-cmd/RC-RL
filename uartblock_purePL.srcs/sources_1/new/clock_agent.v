@@ -124,20 +124,26 @@ module clock_agent #(
                                (fifo3_load >= 2 && fifo3_load <= 5);
             
             // Generate clock enables based on current dividers
+            // ULTRA-SAFE: Very conservative about when to slow down
             for (i = 0; i < NUM_CORES; i = i + 1) begin
                 if (!rl_enable) begin
                     // When RL disabled: force full speed for safety
                     core_clk_en[i] <= 1'b1;
                     core_dividers[i] <= 0;
-                end else if (core_stall || (fifo1_load >= 6) || (fifo2_load >= 6) || (fifo3_load >= 6)) begin
-                    // SAFETY: If any FIFO is getting too full, force full speed
+                end else if (core_stall || (fifo1_load >= 3) || (fifo2_load >= 3) || (fifo3_load >= 3)) begin
+                    // ULTRA-SAFE: If any FIFO >= 3/8 full, force full speed
+                    // This gives plenty of margin before data backs up
                     core_clk_en[i] <= 1'b1;
                     core_dividers[i] <= 0;
                 end else if (core_dividers[i] == 0) begin
                     // No division - always enabled
                     core_clk_en[i] <= 1'b1;
+                end else if (core_dividers[i] > 1) begin
+                    // HARD LIMIT: Never allow divider > 1 (max half speed)
+                    core_clk_en[i] <= 1'b1;
+                    core_dividers[i] <= 0;
                 end else begin
-                    // Clock divider logic
+                    // Clock divider logic (only for divider = 1, meaning half speed)
                     if (div_counters[i] >= core_dividers[i]) begin
                         div_counters[i] <= 0;
                         core_clk_en[i] <= 1'b1;

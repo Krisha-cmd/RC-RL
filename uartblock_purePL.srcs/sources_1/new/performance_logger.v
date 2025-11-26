@@ -27,6 +27,9 @@ module performance_logger #(
     input  wire [3:0] core2_divider,
     input  wire [3:0] core3_divider,
     
+    // RL Agent state
+    input  wire rl_enabled,          // RL agent enabled flag
+    
     // UART TX interface (compatible with tx module)
     output reg  tx_start,
     output reg  [7:0] tx_data,
@@ -129,15 +132,16 @@ module performance_logger #(
                             // Capture current state
                             if (write_addr < MAX_LOG_ENTRIES) begin
                                 current_log_entry <= {
-                                    core_busy,           // [31:28]
-                                    fifo1_load,         // [27:25]
-                                    fifo2_load,         // [24:22]
-                                    fifo3_load,         // [21:19]
-                                    core0_divider,      // [18:15]
-                                    core1_divider,      // [14:11]
-                                    core2_divider,      // [10:7]
-                                    core3_divider,      // [6:3]
-                                    3'b000              // [2:0] reserved
+                                    core_busy,           // [31:28] - 4 bits
+                                    fifo1_load,          // [27:25] - 3 bits
+                                    fifo2_load,          // [24:22] - 3 bits
+                                    fifo3_load,          // [21:19] - 3 bits
+                                    core0_divider,       // [18:15] - 4 bits
+                                    core1_divider,       // [14:11] - 4 bits
+                                    core2_divider,       // [10:7]  - 4 bits
+                                    core3_divider,       // [6:3]   - 4 bits
+                                    rl_enabled,          // [2]     - 1 bit: RL agent state
+                                    2'b00                // [1:0]   - reserved
                                 };
                                 
                                 log_memory[write_addr] <= current_log_entry;

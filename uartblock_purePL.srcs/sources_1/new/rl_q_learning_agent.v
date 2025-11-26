@@ -203,17 +203,19 @@ module rl_q_learning_agent #(
                 
                 STATE_SELECT: begin
                     // Epsilon-greedy action selection
+                    // ULTRA-SAFE: Only explore with very small dividers (0 or 1)
                     if (rand_lfsr < EPSILON) begin
-                        // Explore: random action with SAFE dividers (0-2 only!)
+                        // Explore: random action with ULTRA-SAFE dividers (0-1 only!)
                         explore_flag <= 1;
                         exploration_count <= exploration_count + 1;
                         
-                        // Generate SAFE random dividers (0-2 only, never slow cores too much)
+                        // Generate ULTRA-SAFE random dividers (0-1 only!)
+                        // Only slow down by at most half speed
                         selected_action <= {
-                            rand_lfsr[1:0],                     // core0: 0-3 (limit to safe values)
-                            rand_next[1:0],                     // core1: 0-3
-                            rand_lfsr[3:2],                     // core2: 0-3
-                            rand_next[3:2]                      // core3: 0-3
+                            3'b000, rand_lfsr[0],               // core0: 0-1 only
+                            3'b000, rand_next[0],               // core1: 0-1 only
+                            3'b000, rand_lfsr[1],               // core2: 0-1 only
+                            3'b000, rand_next[1]                // core3: 0-1 only
                         };
                     end else begin
                         // Exploit: use best known action from Q-table
@@ -227,9 +229,10 @@ module rl_q_learning_agent #(
                 end
                 
                 STATE_EXECUTE: begin
-                    // SAFETY CHECK: If any FIFO is filling up (high bits set), force full speed
-                    if (fifo1_load[2] || fifo2_load[2] || fifo3_load[2]) begin
-                        // FIFO more than 50% full - EMERGENCY: run at full speed
+                    // ULTRA-SAFE: Only allow slowdown when ALL FIFOs are very healthy
+                    // If ANY FIFO has load >= 2 (even 25% full), run at full speed
+                    if (fifo1_load >= 3'd2 || fifo2_load >= 3'd2 || fifo3_load >= 3'd2) begin
+                        // FIFO not completely empty - run at full speed for safety
                         rl_core0_div <= 4'd0;
                         rl_core1_div <= 4'd0;
                         rl_core2_div <= 4'd0;
@@ -241,11 +244,12 @@ module rl_q_learning_agent #(
                         rl_core2_div <= 4'd0;
                         rl_core3_div <= 4'd0;
                     end else begin
-                        // Safe to apply RL action, but limit to safe values (max divider = 3)
-                        rl_core0_div <= (selected_action[15:12] > 4'd3) ? 4'd3 : selected_action[15:12];
-                        rl_core1_div <= (selected_action[11:8] > 4'd3) ? 4'd3 : selected_action[11:8];
-                        rl_core2_div <= (selected_action[7:4] > 4'd3) ? 4'd3 : selected_action[7:4];
-                        rl_core3_div <= (selected_action[3:0] > 4'd3) ? 4'd3 : selected_action[3:0];
+                        // All FIFOs are nearly empty (0 or 1) - safe to slow down slightly
+                        // HARD LIMIT: max divider = 1 (half speed, never slower)
+                        rl_core0_div <= (selected_action[15:12] > 4'd1) ? 4'd1 : selected_action[15:12];
+                        rl_core1_div <= (selected_action[11:8] > 4'd1) ? 4'd1 : selected_action[11:8];
+                        rl_core2_div <= (selected_action[7:4] > 4'd1) ? 4'd1 : selected_action[7:4];
+                        rl_core3_div <= (selected_action[3:0] > 4'd1) ? 4'd1 : selected_action[3:0];
                     end
                     rl_update_valid <= 1;
                     

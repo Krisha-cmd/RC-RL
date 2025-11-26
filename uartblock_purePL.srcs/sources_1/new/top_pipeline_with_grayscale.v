@@ -157,6 +157,7 @@ module top_pipeline_with_grayscale #(
         .core1_divider(core1_divider),
         .core2_divider(core2_divider),
         .core3_divider(core3_divider),
+        .rl_enabled(rl_enable),              // Connect RL enable signal
         .logging_enabled(logger_logging_enabled),
         .transmit_logs(logger_transmit_logs),
         .tx_start(logger_tx_start),

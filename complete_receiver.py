@@ -22,7 +22,7 @@ from datetime import datetime
 # ==================== HARDCODED CONFIGURATION ====================
 PORT = 'COM4'
 BAUD = 115200
-INPUT_IMAGE = 'input/images.png'  # Input image path
+INPUT_IMAGE = 'input/test_cyan_yellow.png'  # Input image path
 OUTPUT_DIR = 'output'
 
 # Input image dimensions (what we send to FPGA)
@@ -48,26 +48,32 @@ def decode_log_entry(entry_val):
     """Decode 32-bit performance log entry.
     
     Format (32 bits):
-    [31:28] core_busy (4 bits - one per core)
-    [27:25] fifo3_load (3 bits)
-    [24:22] fifo2_load (3 bits)
-    [21:19] fifo1_load (3 bits)
-    [18:15] core3_divider (4 bits)
-    [14:11] core2_divider (4 bits)
-    [10:7]  core1_divider (4 bits)
-    [6:3]   core0_divider (4 bits)
-    [2:0]   unused
+    [31:28] core_busy (4 bits - one per core: resizer, gray, diffamp, blur)
+    [27:25] fifo1_load (3 bits - 0-7 scale)
+    [24:22] fifo2_load (3 bits - 0-7 scale)
+    [21:19] fifo3_load (3 bits - 0-7 scale)
+    [18:15] core0_divider (4 bits - resizer, 0=full speed)
+    [14:11] core1_divider (4 bits - grayscale)
+    [10:7]  core2_divider (4 bits - diffamp)
+    [6:3]   core3_divider (4 bits - blur)
+    [2]     rl_enabled (1 bit - 1=RL agent active)
+    [1:0]   reserved
     """
     return {
         'raw': entry_val,
         'core_busy': (entry_val >> 28) & 0xF,
-        'fifo3_load': (entry_val >> 25) & 0x7,
+        'core0_busy': (entry_val >> 31) & 0x1,  # resizer
+        'core1_busy': (entry_val >> 30) & 0x1,  # grayscale
+        'core2_busy': (entry_val >> 29) & 0x1,  # diffamp
+        'core3_busy': (entry_val >> 28) & 0x1,  # blur
+        'fifo1_load': (entry_val >> 25) & 0x7,
         'fifo2_load': (entry_val >> 22) & 0x7,
-        'fifo1_load': (entry_val >> 19) & 0x7,
-        'core3_div': (entry_val >> 15) & 0xF,
-        'core2_div': (entry_val >> 11) & 0xF,
-        'core1_div': (entry_val >> 7) & 0xF,
-        'core0_div': (entry_val >> 3) & 0xF,
+        'fifo3_load': (entry_val >> 19) & 0x7,
+        'core0_div': (entry_val >> 15) & 0xF,
+        'core1_div': (entry_val >> 11) & 0xF,
+        'core2_div': (entry_val >> 7) & 0xF,
+        'core3_div': (entry_val >> 3) & 0xF,
+        'rl_enabled': (entry_val >> 2) & 0x1,
     }
 
 
@@ -270,7 +276,7 @@ def save_performance_logs_csv(entries, csv_path):
     
     with open(csv_path, 'w', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=[
-            'entry', 'raw_hex', 'core_busy', 
+            'entry', 'raw_hex', 'rl_enabled', 'core_busy', 
             'fifo1_load', 'fifo2_load', 'fifo3_load',
             'core0_div', 'core1_div', 'core2_div', 'core3_div'
         ])
@@ -280,6 +286,7 @@ def save_performance_logs_csv(entries, csv_path):
             writer.writerow({
                 'entry': i,
                 'raw_hex': f"0x{e['raw']:08X}",
+                'rl_enabled': e.get('rl_enabled', 0),
                 'core_busy': f"{e['core_busy']:04b}",
                 'fifo1_load': e['fifo1_load'],
                 'fifo2_load': e['fifo2_load'],
@@ -294,18 +301,51 @@ def save_performance_logs_csv(entries, csv_path):
 
 
 def print_log_summary(entries):
-    """Print summary of first few log entries."""
+    """Print summary of log entries with analysis."""
     if not entries:
         return
     
-    print(f"\nFirst 5 log entries:")
+    # Check RL state
+    rl_states = [e.get('rl_enabled', 0) for e in entries]
+    rl_enabled = sum(rl_states) > len(rl_states) / 2
+    
+    print(f"\n{'='*60}")
+    print(f"  PERFORMANCE LOG ANALYSIS ({'RL ENABLED' if rl_enabled else 'RL DISABLED'})")
+    print(f"{'='*60}")
+    print(f"  Total entries: {len(entries)}")
+    
+    # Calculate averages
+    n = len(entries)
+    avg_fifo1 = sum(e['fifo1_load'] for e in entries) / n
+    avg_fifo2 = sum(e['fifo2_load'] for e in entries) / n
+    avg_fifo3 = sum(e['fifo3_load'] for e in entries) / n
+    avg_core0 = sum(e['core0_div'] for e in entries) / n
+    avg_core1 = sum(e['core1_div'] for e in entries) / n
+    avg_core2 = sum(e['core2_div'] for e in entries) / n
+    avg_core3 = sum(e['core3_div'] for e in entries) / n
+    
+    print(f"\n  FIFO Load Averages (0-7 scale, lower = healthier):")
+    print(f"    FIFO1 (input->resizer):  {avg_fifo1:.2f}")
+    print(f"    FIFO2 (resizer->gray):   {avg_fifo2:.2f}")
+    print(f"    FIFO3 (blur->output):    {avg_fifo3:.2f}")
+    
+    print(f"\n  Core Divider Averages (0=full speed, higher=slower):")
+    print(f"    Core0 (resizer):   {avg_core0:.2f}")
+    print(f"    Core1 (grayscale): {avg_core1:.2f}")
+    print(f"    Core2 (diffamp):   {avg_core2:.2f}")
+    print(f"    Core3 (blur):      {avg_core3:.2f}")
+    
+    # Count divider > 0
+    nonzero_div = sum(1 for e in entries if any([e['core0_div'], e['core1_div'], e['core2_div'], e['core3_div']]))
+    print(f"\n  Entries with any divider > 0: {nonzero_div}/{n} ({100*nonzero_div/n:.1f}%)")
+    
+    print(f"\n  First 5 entries:")
     for i, e in enumerate(entries[:5]):
-        if e['raw'] == 0xDEADBEEF:
-            print(f"  [{i}] 0xDEADBEEF - DEFAULT ENTRY")
-        else:
-            print(f"  [{i}] Busy:{e['core_busy']:04b} "
-                  f"FIFOs:[{e['fifo1_load']},{e['fifo2_load']},{e['fifo3_load']}] "
-                  f"Divs:[{e['core0_div']},{e['core1_div']},{e['core2_div']},{e['core3_div']}]")
+        rl_flag = "RL" if e.get('rl_enabled', 0) else "--"
+        print(f"    [{i:3d}] [{rl_flag}] FIFO:[{e['fifo1_load']},{e['fifo2_load']},{e['fifo3_load']}] "
+              f"Div:[{e['core0_div']},{e['core1_div']},{e['core2_div']},{e['core3_div']}]")
+    
+    print(f"{'='*60}\n")
 
 
 def main():
