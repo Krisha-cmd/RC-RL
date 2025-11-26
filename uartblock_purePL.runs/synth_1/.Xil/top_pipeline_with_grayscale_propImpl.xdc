@@ -15,3 +15,7 @@ set_property src_info {type:XDC file:1 line:22 export:INPUT save:INPUT read:READ
 set_property PACKAGE_PIN U22 [get_ports led_rx_activity]
 set_property src_info {type:XDC file:1 line:23 export:INPUT save:INPUT read:READ} [current_design]
 set_property PACKAGE_PIN U14 [get_ports led_gray_busy]
+set_property src_info {type:XDC file:1 line:30 export:INPUT save:INPUT read:READ} [current_design]
+set_property PACKAGE_PIN U21 [get_ports led_blur_busy]
+set_property src_info {type:XDC file:1 line:31 export:INPUT save:INPUT read:READ} [current_design]
+set_property PACKAGE_PIN W22 [get_ports led_diffamp_busy]

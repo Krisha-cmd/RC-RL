@@ -7,6 +7,7 @@ module grayscale_core #(
 )(
     input  wire                     clk,
     input  wire                     rst,
+    input  wire                     clk_en,        // clock enable from agent
 
     input  wire [3*PIXEL_WIDTH-1:0] data_in,    
     input  wire                     read_signal,
@@ -33,7 +34,7 @@ module grayscale_core #(
             data_out     <= 8'd0;
             write_signal <= 1'b0;
             state        <= 1'b0;
-        end else begin
+        end else if (clk_en) begin
             write_signal <= 1'b0;    
             state        <= 1'b0;    // default: idle
 

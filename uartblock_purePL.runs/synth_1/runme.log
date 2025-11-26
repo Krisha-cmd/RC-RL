@@ -8,11 +8,12 @@
   **** SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
   **** IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
   **** SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
-  **** Start of session at: Wed Nov 26 15:20:49 2025
+  **** Start of session at: Wed Nov 26 18:39:09 2025
     ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
     ** Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 
 source top_pipeline_with_grayscale.tcl -notrace
+create_project: Time (s): cpu = 00:00:09 ; elapsed = 00:00:06 . Memory (MB): peak = 480.984 ; gain = 209.316
 Command: read_checkpoint -auto_incremental -incremental C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/utils_1/imports/synth_1/top_module.dcp
 INFO: [Vivado 12-5825] Read reference checkpoint from C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/utils_1/imports/synth_1/top_module.dcp for incremental synthesis
 INFO: [Vivado 12-7989] Please ensure there are no constraint changes
@@ -25,13 +26,36 @@ INFO: [Designutils 20-5440] No compile time benefit to using incremental synthes
 INFO: [Designutils 20-4379] Flow is switching to default flow due to incremental criteria not met. If you would like to alter this behaviour and have the flow terminate instead, please set the following parameter config_implementation {autoIncr.Synth.RejectBehavior Terminate}
 INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 2 processes.
 INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
-INFO: [Synth 8-7075] Helper process launched with PID 7052
+INFO: [Synth 8-7075] Helper process launched with PID 22000
 ---------------------------------------------------------------------------------
-Starting RTL Elaboration : Time (s): cpu = 00:00:03 ; elapsed = 00:00:04 . Memory (MB): peak = 1212.250 ; gain = 494.215
+Starting RTL Elaboration : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 1213.062 ; gain = 494.172
 ---------------------------------------------------------------------------------
+WARNING: [Synth 8-6901] identifier 'core_dividers' is used before its declaration [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:38]
+WARNING: [Synth 8-6901] identifier 'core_dividers' is used before its declaration [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:39]
+WARNING: [Synth 8-6901] identifier 'core_dividers' is used before its declaration [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:40]
+WARNING: [Synth 8-6901] identifier 'core_dividers' is used before its declaration [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:41]
+INFO: [Synth 8-11241] undeclared symbol 'fifo1_load_bucket', assumed default net type 'wire' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_pipeline_with_grayscale.v:60]
+INFO: [Synth 8-11241] undeclared symbol 'fifo2_load_bucket', assumed default net type 'wire' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_pipeline_with_grayscale.v:61]
+INFO: [Synth 8-11241] undeclared symbol 'fifo3_load_bucket', assumed default net type 'wire' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_pipeline_with_grayscale.v:62]
+WARNING: [Synth 8-8895] 'fifo1_load_bucket' is already implicitly declared on line 60 [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_pipeline_with_grayscale.v:203]
+WARNING: [Synth 8-8895] 'fifo2_load_bucket' is already implicitly declared on line 61 [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_pipeline_with_grayscale.v:312]
+WARNING: [Synth 8-8895] 'fifo3_load_bucket' is already implicitly declared on line 62 [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_pipeline_with_grayscale.v:472]
+WARNING: [Synth 8-6901] identifier 'image_processing_done' is used before its declaration [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_pipeline_with_grayscale.v:126]
 INFO: [Synth 8-6157] synthesizing module 'top_pipeline_with_grayscale' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_pipeline_with_grayscale.v:8]
+INFO: [Synth 8-6157] synthesizing module 'clock_agent' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:7]
+	Parameter NUM_CORES bound to: 4 - type: integer 
+	Parameter UPDATE_INTERVAL bound to: 100 - type: integer 
+	Parameter MAX_DIV_BITS bound to: 4 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'clock_agent' (0#1) [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:7]
 INFO: [Synth 8-6157] synthesizing module 'rx' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/rx.v:1]
 INFO: [Synth 8-6155] done synthesizing module 'rx' (0#1) [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/rx.v:1]
+INFO: [Synth 8-6157] synthesizing module 'performance_logger' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/performance_logger.v:6]
+	Parameter LOG_INTERVAL bound to: 100 - type: integer 
+	Parameter MAX_LOG_ENTRIES bound to: 512 - type: integer 
+INFO: [Synth 8-155] case statement is not full and has no default [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/performance_logger.v:154]
+INFO: [Synth 8-155] case statement is not full and has no default [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/performance_logger.v:201]
+INFO: [Synth 8-155] case statement is not full and has no default [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/performance_logger.v:231]
+INFO: [Synth 8-6155] done synthesizing module 'performance_logger' (0#1) [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/performance_logger.v:6]
 INFO: [Synth 8-6157] synthesizing module 'tx' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/tx.v:3]
 	Parameter CLOCK_FREQ bound to: 100000000 - type: integer 
 	Parameter BAUD_RATE bound to: 115200 - type: integer 
@@ -66,7 +90,7 @@ INFO: [Synth 8-6157] synthesizing module 'grayscale_core' [C:/Users/iamri/Docume
 INFO: [Synth 8-6155] done synthesizing module 'grayscale_core' (0#1) [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/grayscale_core.v:3]
 INFO: [Synth 8-6157] synthesizing module 'difference_amplifier' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/difference_amplifier.v:7]
 	Parameter PIXEL_WIDTH bound to: 8 - type: integer 
-	Parameter GAIN bound to: 2 - type: integer 
+	Parameter GAIN bound to: 3 - type: integer 
 INFO: [Synth 8-6155] done synthesizing module 'difference_amplifier' (0#1) [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/difference_amplifier.v:7]
 INFO: [Synth 8-6157] synthesizing module 'box_blur_1d' [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/box_blur_1d.v:7]
 	Parameter PIXEL_WIDTH bound to: 8 - type: integer 
@@ -81,25 +105,58 @@ INFO: [Synth 8-6157] synthesizing module 'bram_11__parameterized0' [C:/Users/iam
 INFO: [Synth 8-6155] done synthesizing module 'bram_11__parameterized0' (0#1) [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/bram11.v:4]
 INFO: [Synth 8-6155] done synthesizing module 'bram_fifo__parameterized0' (0#1) [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/bram_fifo.v:2]
 INFO: [Synth 8-6155] done synthesizing module 'top_pipeline_with_grayscale' (0#1) [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_pipeline_with_grayscale.v:8]
+WARNING: [Synth 8-6014] Unused sequential element state_reg was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:74]
+WARNING: [Synth 8-6014] Unused sequential element interval_counter_reg was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:75]
+WARNING: [Synth 8-6014] Unused sequential element div_counters_reg[0] was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:82]
+WARNING: [Synth 8-6014] Unused sequential element div_counters_reg[1] was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:82]
+WARNING: [Synth 8-6014] Unused sequential element div_counters_reg[2] was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:82]
+WARNING: [Synth 8-6014] Unused sequential element div_counters_reg[3] was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:82]
+WARNING: [Synth 8-6014] Unused sequential element core_active_cycles_reg[0] was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:83]
+WARNING: [Synth 8-6014] Unused sequential element core_active_cycles_reg[1] was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:83]
+WARNING: [Synth 8-6014] Unused sequential element core_active_cycles_reg[2] was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:83]
+WARNING: [Synth 8-6014] Unused sequential element core_active_cycles_reg[3] was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:83]
+WARNING: [Synth 8-6014] Unused sequential element core_idle_cycles_reg[0] was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:84]
+WARNING: [Synth 8-6014] Unused sequential element core_idle_cycles_reg[1] was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:84]
+WARNING: [Synth 8-6014] Unused sequential element core_idle_cycles_reg[2] was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:84]
+WARNING: [Synth 8-6014] Unused sequential element core_idle_cycles_reg[3] was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:84]
+WARNING: [Synth 8-6014] Unused sequential element new_dividers_reg[0] was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:85]
+WARNING: [Synth 8-6014] Unused sequential element new_dividers_reg[1] was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:85]
+WARNING: [Synth 8-6014] Unused sequential element new_dividers_reg[2] was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:85]
+WARNING: [Synth 8-6014] Unused sequential element new_dividers_reg[3] was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v:85]
 WARNING: [Synth 8-6014] Unused sequential element b2_reg was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/pixel_assembler.v:26]
-WARNING: [Synth 8-6014] Unused sequential element diff_reg was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/difference_amplifier.v:34]
-WARNING: [Synth 8-6014] Unused sequential element amplified_reg was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/difference_amplifier.v:35]
-WARNING: [Synth 8-6014] Unused sequential element result_reg was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/difference_amplifier.v:36]
-WARNING: [Synth 8-6014] Unused sequential element sum_reg was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/box_blur_1d.v:44]
-WARNING: [Synth 8-3848] Net fifo2_wr_ready in module/entity top_pipeline_with_grayscale does not have driver. [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_pipeline_with_grayscale.v:232]
+WARNING: [Synth 8-6014] Unused sequential element diff_reg was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/difference_amplifier.v:35]
+WARNING: [Synth 8-6014] Unused sequential element amplified_reg was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/difference_amplifier.v:36]
+WARNING: [Synth 8-6014] Unused sequential element result_reg was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/difference_amplifier.v:37]
+WARNING: [Synth 8-6014] Unused sequential element prev_reg was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/box_blur_1d.v:40]
+WARNING: [Synth 8-6014] Unused sequential element sum_reg was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/box_blur_1d.v:45]
+WARNING: [Synth 8-6014] Unused sequential element image_tx_complete_reg was removed.  [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_pipeline_with_grayscale.v:521]
+WARNING: [Synth 8-3848] Net fifo2_wr_ready in module/entity top_pipeline_with_grayscale does not have driver. [C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_pipeline_with_grayscale.v:311]
+WARNING: [Synth 8-7129] Port core_busy[3] in module clock_agent is either unconnected or has no load
+WARNING: [Synth 8-7129] Port core_busy[2] in module clock_agent is either unconnected or has no load
+WARNING: [Synth 8-7129] Port core_busy[1] in module clock_agent is either unconnected or has no load
+WARNING: [Synth 8-7129] Port core_busy[0] in module clock_agent is either unconnected or has no load
+WARNING: [Synth 8-7129] Port fifo1_load[2] in module clock_agent is either unconnected or has no load
+WARNING: [Synth 8-7129] Port fifo1_load[1] in module clock_agent is either unconnected or has no load
+WARNING: [Synth 8-7129] Port fifo1_load[0] in module clock_agent is either unconnected or has no load
+WARNING: [Synth 8-7129] Port fifo2_load[2] in module clock_agent is either unconnected or has no load
+WARNING: [Synth 8-7129] Port fifo2_load[1] in module clock_agent is either unconnected or has no load
+WARNING: [Synth 8-7129] Port fifo2_load[0] in module clock_agent is either unconnected or has no load
+WARNING: [Synth 8-7129] Port fifo3_load[2] in module clock_agent is either unconnected or has no load
+WARNING: [Synth 8-7129] Port fifo3_load[1] in module clock_agent is either unconnected or has no load
+WARNING: [Synth 8-7129] Port fifo3_load[0] in module clock_agent is either unconnected or has no load
 ---------------------------------------------------------------------------------
-Finished RTL Elaboration : Time (s): cpu = 00:00:04 ; elapsed = 00:00:05 . Memory (MB): peak = 1333.609 ; gain = 615.574
+Finished RTL Elaboration : Time (s): cpu = 00:00:08 ; elapsed = 00:00:08 . Memory (MB): peak = 1419.477 ; gain = 700.586
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:00:04 ; elapsed = 00:00:05 . Memory (MB): peak = 1333.609 ; gain = 615.574
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:08 ; elapsed = 00:00:09 . Memory (MB): peak = 1419.477 ; gain = 700.586
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:04 ; elapsed = 00:00:05 . Memory (MB): peak = 1333.609 ; gain = 615.574
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:08 ; elapsed = 00:00:09 . Memory (MB): peak = 1419.477 ; gain = 700.586
 ---------------------------------------------------------------------------------
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.014 . Memory (MB): peak = 1333.609 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.162 . Memory (MB): peak = 1419.477 ; gain = 0.000
 INFO: [Project 1-570] Preparing netlist for logic optimization
 
 Processing XDC Constraints
@@ -110,30 +167,31 @@ INFO: [Project 1-236] Implementation specific constraints were found while readi
 Resolution: To avoid this warning, move constraints listed in [.Xil/top_pipeline_with_grayscale_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
 Completed Processing XDC Constraints
 
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.001 . Memory (MB): peak = 1384.031 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.005 . Memory (MB): peak = 1488.121 ; gain = 0.000
 INFO: [Project 1-111] Unisim Transformation Summary:
 No Unisim elements were transformed.
 
-Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.004 . Memory (MB): peak = 1384.031 ; gain = 0.000
+Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.082 . Memory (MB): peak = 1488.121 ; gain = 0.000
 INFO: [Designutils 20-5440] No compile time benefit to using incremental synthesis; A full resynthesis will be run
 INFO: [Designutils 20-4379] Flow is switching to default flow due to incremental criteria not met. If you would like to alter this behaviour and have the flow terminate instead, please set the following parameter config_implementation {autoIncr.Synth.RejectBehavior Terminate}
 ---------------------------------------------------------------------------------
-Finished Constraint Validation : Time (s): cpu = 00:00:10 ; elapsed = 00:00:11 . Memory (MB): peak = 1384.031 ; gain = 665.996
+Finished Constraint Validation : Time (s): cpu = 00:00:17 ; elapsed = 00:00:18 . Memory (MB): peak = 1488.121 ; gain = 769.230
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Loading Part and Timing Information
 ---------------------------------------------------------------------------------
 Loading part: xc7z020clg484-1
 ---------------------------------------------------------------------------------
-Finished Loading Part and Timing Information : Time (s): cpu = 00:00:10 ; elapsed = 00:00:11 . Memory (MB): peak = 1384.031 ; gain = 665.996
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:17 ; elapsed = 00:00:18 . Memory (MB): peak = 1488.121 ; gain = 769.230
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Applying 'set_property' XDC Constraints
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:10 ; elapsed = 00:00:11 . Memory (MB): peak = 1384.031 ; gain = 665.996
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:17 ; elapsed = 00:00:18 . Memory (MB): peak = 1488.121 ; gain = 769.230
 ---------------------------------------------------------------------------------
 INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'rx'
+INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'performance_logger'
 INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'pixel_assembler'
 INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'pixel_splitter'
 INFO: [Synth 8-802] inferred FSM for state register 'startup_state_reg' in module 'box_blur_1d'
@@ -146,6 +204,17 @@ INFO: [Synth 8-802] inferred FSM for state register 'startup_state_reg' in modul
                 STOP_BIT |                               11 |                               11
 ---------------------------------------------------------------------------------------------------
 INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'sequential' in module 'rx'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+              STATE_IDLE |                              000 |                              000
+           STATE_LOGGING |                              001 |                              001
+         STATE_TX_HEADER |                              010 |                              010
+           STATE_TX_DATA |                              011 |                              011
+         STATE_TX_FOOTER |                              100 |                              100
+              STATE_DONE |                              101 |                              101
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'sequential' in module 'performance_logger'
 ---------------------------------------------------------------------------------------------------
                    State |                     New Encoding |                Previous Encoding 
 ---------------------------------------------------------------------------------------------------
@@ -176,7 +245,7 @@ INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 
 ---------------------------------------------------------------------------------------------------
 INFO: [Synth 8-3354] encoded FSM with state register 'startup_state_reg' using encoding 'one-hot' in module 'box_blur_1d'
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:10 ; elapsed = 00:00:12 . Memory (MB): peak = 1384.031 ; gain = 665.996
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:22 ; elapsed = 00:00:24 . Memory (MB): peak = 1488.121 ; gain = 769.230
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start RTL Component Statistics 
@@ -184,14 +253,13 @@ Start RTL Component Statistics
 Detailed RTL Component Info : 
 +---Adders : 
 	   2 Input   23 Bit       Adders := 6     
-	   2 Input   16 Bit       Adders := 3     
+	   2 Input   16 Bit       Adders := 6     
 	   2 Input   14 Bit       Adders := 4     
 	   3 Input   14 Bit       Adders := 6     
 	   2 Input   13 Bit       Adders := 2     
 	   3 Input   13 Bit       Adders := 3     
-	   2 Input   10 Bit       Adders := 1     
-	   3 Input   10 Bit       Adders := 1     
-	   2 Input    8 Bit       Adders := 1     
+	   2 Input   10 Bit       Adders := 2     
+	   2 Input    9 Bit       Adders := 3     
 	   2 Input    7 Bit       Adders := 2     
 	   2 Input    4 Bit       Adders := 1     
 	   2 Input    3 Bit       Adders := 1     
@@ -201,38 +269,47 @@ Detailed RTL Component Info :
 	   2 Input     13 Bit         XORs := 2     
 	  13 Input     13 Bit         XORs := 2     
 +---Registers : 
+	               32 Bit    Registers := 515   
 	               24 Bit    Registers := 4     
 	               23 Bit    Registers := 6     
-	               16 Bit    Registers := 3     
+	               16 Bit    Registers := 7     
 	               14 Bit    Registers := 12    
 	               13 Bit    Registers := 6     
 	               10 Bit    Registers := 1     
+	                9 Bit    Registers := 1     
 	                8 Bit    Registers := 18    
 	                7 Bit    Registers := 2     
-	                4 Bit    Registers := 1     
-	                3 Bit    Registers := 4     
-	                1 Bit    Registers := 27    
+	                4 Bit    Registers := 6     
+	                3 Bit    Registers := 5     
+	                1 Bit    Registers := 36    
 +---RAMs : 
 	              64K Bit	(8192 X 8 bit)          RAMs := 2     
 	              32K Bit	(4096 X 8 bit)          RAMs := 1     
 +---Muxes : 
 	   3 Input   23 Bit        Muxes := 6     
 	   4 Input   16 Bit        Muxes := 2     
-	   2 Input   16 Bit        Muxes := 3     
+	   2 Input   16 Bit        Muxes := 11    
+	   6 Input   16 Bit        Muxes := 2     
+	   3 Input   16 Bit        Muxes := 1     
 	   2 Input   10 Bit        Muxes := 1     
-	   4 Input    8 Bit        Muxes := 4     
+	   6 Input    9 Bit        Muxes := 2     
+	   4 Input    8 Bit        Muxes := 5     
+	   7 Input    8 Bit        Muxes := 1     
+	   2 Input    8 Bit        Muxes := 4     
+	   6 Input    8 Bit        Muxes := 1     
 	   3 Input    8 Bit        Muxes := 1     
-	   2 Input    8 Bit        Muxes := 3     
 	   2 Input    4 Bit        Muxes := 1     
-	   4 Input    3 Bit        Muxes := 1     
-	   7 Input    3 Bit        Muxes := 2     
-	   2 Input    3 Bit        Muxes := 6     
+	   4 Input    3 Bit        Muxes := 2     
+	   7 Input    3 Bit        Muxes := 3     
+	   2 Input    3 Bit        Muxes := 10    
+	   6 Input    3 Bit        Muxes := 2     
 	   4 Input    2 Bit        Muxes := 1     
 	   2 Input    2 Bit        Muxes := 4     
 	   3 Input    2 Bit        Muxes := 1     
-	   2 Input    1 Bit        Muxes := 11    
-	   4 Input    1 Bit        Muxes := 7     
-	   7 Input    1 Bit        Muxes := 12    
+	   2 Input    1 Bit        Muxes := 23    
+	   4 Input    1 Bit        Muxes := 9     
+	   7 Input    1 Bit        Muxes := 14    
+	   6 Input    1 Bit        Muxes := 523   
 	   3 Input    1 Bit        Muxes := 5     
 ---------------------------------------------------------------------------------
 Finished RTL Component Statistics 
@@ -251,7 +328,7 @@ Start Cross Boundary and Area Optimization
 ---------------------------------------------------------------------------------
 WARNING: [Synth 8-7080] Parallel synthesis criteria is not met
 ---------------------------------------------------------------------------------
-Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:13 ; elapsed = 00:00:15 . Memory (MB): peak = 1411.797 ; gain = 693.762
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:38 ; elapsed = 00:00:41 . Memory (MB): peak = 1637.379 ; gain = 918.488
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start ROM, RAM, DSP, Shift Register and Retiming Reporting
@@ -274,13 +351,13 @@ Finished ROM, RAM, DSP, Shift Register and Retiming Reporting
 Start Applying XDC Timing Constraints
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Applying XDC Timing Constraints : Time (s): cpu = 00:00:18 ; elapsed = 00:00:19 . Memory (MB): peak = 1554.266 ; gain = 836.230
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:00:43 ; elapsed = 00:00:47 . Memory (MB): peak = 1637.379 ; gain = 918.488
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Timing Optimization
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Timing Optimization : Time (s): cpu = 00:00:18 ; elapsed = 00:00:20 . Memory (MB): peak = 1556.348 ; gain = 838.312
+Finished Timing Optimization : Time (s): cpu = 00:00:46 ; elapsed = 00:00:49 . Memory (MB): peak = 1637.379 ; gain = 918.488
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start ROM, RAM, DSP, Shift Register and Retiming Reporting
@@ -306,7 +383,7 @@ INFO: [Synth 8-7052] The timing for the instance fifo1/bram_inst/mem_reg_1 (impl
 INFO: [Synth 8-7052] The timing for the instance fifo2/bram_inst/mem_reg_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
 INFO: [Synth 8-7052] The timing for the instance fifo2/bram_inst/mem_reg_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
 ---------------------------------------------------------------------------------
-Finished Technology Mapping : Time (s): cpu = 00:00:18 ; elapsed = 00:00:20 . Memory (MB): peak = 1584.969 ; gain = 866.934
+Finished Technology Mapping : Time (s): cpu = 00:00:48 ; elapsed = 00:00:51 . Memory (MB): peak = 1642.605 ; gain = 923.715
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start IO Insertion
@@ -324,37 +401,37 @@ Start Final Netlist Cleanup
 Finished Final Netlist Cleanup
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished IO Insertion : Time (s): cpu = 00:00:21 ; elapsed = 00:00:23 . Memory (MB): peak = 1797.090 ; gain = 1079.055
+Finished IO Insertion : Time (s): cpu = 00:00:52 ; elapsed = 00:00:55 . Memory (MB): peak = 1842.191 ; gain = 1123.301
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Instances
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Instances : Time (s): cpu = 00:00:21 ; elapsed = 00:00:23 . Memory (MB): peak = 1797.090 ; gain = 1079.055
+Finished Renaming Generated Instances : Time (s): cpu = 00:00:52 ; elapsed = 00:00:55 . Memory (MB): peak = 1842.191 ; gain = 1123.301
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Rebuilding User Hierarchy
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:21 ; elapsed = 00:00:23 . Memory (MB): peak = 1797.090 ; gain = 1079.055
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:52 ; elapsed = 00:00:56 . Memory (MB): peak = 1842.191 ; gain = 1123.301
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Ports
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Ports : Time (s): cpu = 00:00:21 ; elapsed = 00:00:23 . Memory (MB): peak = 1797.090 ; gain = 1079.055
+Finished Renaming Generated Ports : Time (s): cpu = 00:00:52 ; elapsed = 00:00:56 . Memory (MB): peak = 1842.191 ; gain = 1123.301
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:00:21 ; elapsed = 00:00:23 . Memory (MB): peak = 1798.102 ; gain = 1080.066
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:52 ; elapsed = 00:00:56 . Memory (MB): peak = 1849.117 ; gain = 1130.227
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Nets
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Nets : Time (s): cpu = 00:00:21 ; elapsed = 00:00:23 . Memory (MB): peak = 1798.102 ; gain = 1080.066
+Finished Renaming Generated Nets : Time (s): cpu = 00:00:52 ; elapsed = 00:00:56 . Memory (MB): peak = 1849.117 ; gain = 1130.227
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Writing Synthesis Report
@@ -371,42 +448,45 @@ Report Cell Usage:
 |      |Cell     |Count |
 +------+---------+------+
 |1     |BUFG     |     1|
-|2     |CARRY4   |   144|
-|3     |LUT1     |   175|
-|4     |LUT2     |   211|
-|5     |LUT3     |    93|
-|6     |LUT4     |   103|
-|7     |LUT5     |    54|
-|8     |LUT6     |   148|
-|9     |RAMB36E1 |     5|
-|11    |FDCE     |   571|
-|12    |FDPE     |    11|
-|13    |FDRE     |   195|
-|14    |IBUF     |     3|
-|15    |OBUF     |     7|
+|2     |CARRY4   |   172|
+|3     |LUT1     |   176|
+|4     |LUT2     |   326|
+|5     |LUT3     |   137|
+|6     |LUT4     |   210|
+|7     |LUT5     |   192|
+|8     |LUT6     |  2427|
+|9     |MUXF7    |   885|
+|10    |MUXF8    |   416|
+|11    |RAMB36E1 |     5|
+|13    |FDCE     |   572|
+|14    |FDPE     |    11|
+|15    |FDRE     |  7110|
+|16    |IBUF     |     3|
+|17    |OBUF     |     7|
 +------+---------+------+
 ---------------------------------------------------------------------------------
-Finished Writing Synthesis Report : Time (s): cpu = 00:00:21 ; elapsed = 00:00:23 . Memory (MB): peak = 1798.102 ; gain = 1080.066
+Finished Writing Synthesis Report : Time (s): cpu = 00:00:52 ; elapsed = 00:00:56 . Memory (MB): peak = 1849.117 ; gain = 1130.227
 ---------------------------------------------------------------------------------
 Synthesis finished with 0 errors, 0 critical warnings and 1 warnings.
-Synthesis Optimization Runtime : Time (s): cpu = 00:00:15 ; elapsed = 00:00:21 . Memory (MB): peak = 1798.102 ; gain = 1029.645
-Synthesis Optimization Complete : Time (s): cpu = 00:00:21 ; elapsed = 00:00:23 . Memory (MB): peak = 1798.102 ; gain = 1080.066
+Synthesis Optimization Runtime : Time (s): cpu = 00:00:40 ; elapsed = 00:00:53 . Memory (MB): peak = 1849.117 ; gain = 1061.582
+Synthesis Optimization Complete : Time (s): cpu = 00:00:52 ; elapsed = 00:00:56 . Memory (MB): peak = 1849.117 ; gain = 1130.227
 INFO: [Project 1-571] Translating synthesized netlist
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.014 . Memory (MB): peak = 1807.223 ; gain = 0.000
-INFO: [Netlist 29-17] Analyzing 149 Unisim elements for replacement
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.077 . Memory (MB): peak = 1858.320 ; gain = 0.000
+INFO: [Netlist 29-17] Analyzing 1478 Unisim elements for replacement
 INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+WARNING: [Netlist 29-101] Netlist 'top_pipeline_with_grayscale' is not ideal for floorplanning, since the cellview 'performance_logger' contains a large number of primitives.  Please consider enabling hierarchy in synthesis if you want to do floorplanning.
 INFO: [Project 1-570] Preparing netlist for logic optimization
 INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1810.910 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.002 . Memory (MB): peak = 1862.590 ; gain = 0.000
 INFO: [Project 1-111] Unisim Transformation Summary:
 No Unisim elements were transformed.
 
-Synth Design complete | Checksum: 751da45f
+Synth Design complete | Checksum: eceaff6f
 INFO: [Common 17-83] Releasing license: Synthesis
-60 Infos, 7 Warnings, 0 Critical Warnings and 0 Errors encountered.
+72 Infos, 49 Warnings, 0 Critical Warnings and 0 Errors encountered.
 synth_design completed successfully
-synth_design: Time (s): cpu = 00:00:24 ; elapsed = 00:00:27 . Memory (MB): peak = 1810.910 ; gain = 1323.949
-Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.004 . Memory (MB): peak = 1810.910 ; gain = 0.000
+synth_design: Time (s): cpu = 00:00:57 ; elapsed = 00:01:02 . Memory (MB): peak = 1862.590 ; gain = 1375.707
+Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.018 . Memory (MB): peak = 1862.590 ; gain = 0.000
 INFO: [Common 17-1381] The checkpoint 'C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.runs/synth_1/top_pipeline_with_grayscale.dcp' has been generated.
 INFO: [Vivado 12-24828] Executing command : report_utilization -file top_pipeline_with_grayscale_utilization_synth.rpt -pb top_pipeline_with_grayscale_utilization_synth.pb
-INFO: [Common 17-206] Exiting Vivado at Wed Nov 26 15:21:22 2025...
+INFO: [Common 17-206] Exiting Vivado at Wed Nov 26 18:40:20 2025...

@@ -10,6 +10,7 @@ module difference_amplifier #(
 )(
     input  wire                     clk,
     input  wire                     rst,
+    input  wire                     clk_en,        // clock enable from agent
 
     input  wire [PIXEL_WIDTH-1:0]   data_in,
     input  wire                     read_signal,
@@ -34,7 +35,7 @@ module difference_amplifier #(
             diff         <= 10'd0;
             amplified    <= 11'd0;
             result       <= 10'd0;
-        end else begin
+        end else if (clk_en) begin
             write_signal <= 1'b0;
             state        <= 1'b0;
 

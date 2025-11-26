@@ -10,6 +10,7 @@ module box_blur_1d #(
 )(
     input  wire                     clk,
     input  wire                     rst,
+    input  wire                     clk_en,        // clock enable from agent
 
     input  wire [PIXEL_WIDTH-1:0]   data_in,
     input  wire                     read_signal,
@@ -42,7 +43,7 @@ module box_blur_1d #(
             pixel_count   <= 16'd0;
             startup_state <= 2'd0;
             sum           <= 10'd0;
-        end else begin
+        end else if (clk_en) begin
             write_signal <= 1'b0;
             state        <= 1'b0;
 

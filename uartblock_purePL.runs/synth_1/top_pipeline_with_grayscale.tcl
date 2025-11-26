@@ -58,11 +58,7 @@ if {$::dispatch::connected} {
 OPTRACE "synth_1" START { ROLLUP_AUTO }
 set_param chipscope.maxJobs 4
 set_param general.usePosixSpawnForFork 1
-set_param checkpoint.writeSynthRtdsInDcp 1
 set_param xicom.use_bs_reader 1
-set_msg_config -id {Common 17-41} -limit 10000000
-set_msg_config -id {Synth 8-256} -limit 10000
-set_msg_config -id {Synth 8-638} -limit 10000
 OPTRACE "Creating in-memory project" START { }
 create_project -in_memory -part xc7z020clg484-1
 
@@ -81,8 +77,10 @@ read_verilog -library xil_defaultlib {
   C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/box_blur_1d.v
   C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/bram11.v
   C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/bram_fifo.v
+  C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/clock_agent.v
   C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/difference_amplifier.v
   C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/grayscale_core.v
+  C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/performance_logger.v
   C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/pixel_assembler.v
   C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/pixel_splitter.v
   C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/resizer_core.v

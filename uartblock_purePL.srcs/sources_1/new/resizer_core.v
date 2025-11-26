@@ -13,6 +13,7 @@ module resizer_core #(
 )(
     input  wire                             clk,
     input  wire                             rst,
+    input  wire                             clk_en,        // clock enable from agent
 
     input  wire [CHANNELS*PIXEL_WIDTH-1:0]  data_in,
     input  wire                             read_signal,   // pulse: consume 1 pixel
@@ -38,7 +39,7 @@ module resizer_core #(
             write_signal <= 0;
             frame_done   <= 0;
             state        <= 0;
-        end else begin
+        end else if (clk_en) begin
             // defaults each cycle
             write_signal <= 0;
             frame_done   <= 0;
