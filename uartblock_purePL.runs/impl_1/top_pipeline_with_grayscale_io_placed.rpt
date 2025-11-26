@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version              : Vivado v.2025.1 (win64) Build 6140274 Thu May 22 00:12:29 MDT 2025
-| Date                      : Wed Nov 26 15:09:58 2025
+| Date                      : Wed Nov 26 15:26:35 2025
 | Host                      : BOOK-JBCPDRK7D5 running 64-bit major release  (build 9200)
 | Command                   : report_io -file top_pipeline_with_grayscale_io_placed.rpt
 | Design                    : top_pipeline_with_grayscale
@@ -25,7 +25,7 @@ Table of Contents
 +---------------+
 | Total User IO |
 +---------------+
-|             8 |
+|            10 |
 +---------------+
 
 
@@ -451,7 +451,7 @@ Table of Contents
 | U18        |                  | High Range | VCCO_33                 | VCCO        |             |      33 |            |      |                     |                      |    3.30 |            |           |          |      |                  |              |                   |              |
 | U19        |                  | High Range | IO_0_33                 | User IO     |             |      33 |            |      |                     |                      |         |            |           |          |      |                  |              |                   |              |
 | U20        |                  | High Range | IO_L5P_T0_33            | User IO     |             |      33 |            |      |                     |                      |         |            |           |          |      |                  |              |                   |              |
-| U21        |                  | High Range | IO_L1N_T0_33            | User IO     |             |      33 |            |      |                     |                      |         |            |           |          |      |                  |              |                   |              |
+| U21        | led_blur_busy    | High Range | IO_L1N_T0_33            | OUTPUT      | LVCMOS33    |      33 |         12 | SLOW |                     |            FP_VTT_50 |         | FIXED      |           |          |      | NONE             |              |                   |              |
 | U22        | led_rx_activity  | High Range | IO_L2N_T0_33            | OUTPUT      | LVCMOS33    |      33 |         12 | SLOW |                     |            FP_VTT_50 |         | FIXED      |           |          |      | NONE             |              |                   |              |
 | V1         |                  |            | VCCO_DDR_502            | VCCO        |             |         |            |      |                     |                      |   any** |            |           |          |      |                  |              |                   |              |
 | V2         |                  |            | PS_DDR_DQS_P3_502       | PSS IO      |             |         |            |      |                     |                      |         |            |           |          |      |                  |              |                   |              |
@@ -496,7 +496,7 @@ Table of Contents
 | W19        |                  |            | GND                     | GND         |             |         |            |      |                     |                      |     0.0 |            |           |          |      |                  |              |                   |              |
 | W20        |                  | High Range | IO_L4P_T0_33            | User IO     |             |      33 |            |      |                     |                      |         |            |           |          |      |                  |              |                   |              |
 | W21        |                  | High Range | IO_L4N_T0_33            | User IO     |             |      33 |            |      |                     |                      |         |            |           |          |      |                  |              |                   |              |
-| W22        |                  | High Range | IO_L3N_T0_DQS_33        | User IO     |             |      33 |            |      |                     |                      |         |            |           |          |      |                  |              |                   |              |
+| W22        | led_diffamp_busy | High Range | IO_L3N_T0_DQS_33        | OUTPUT      | LVCMOS33    |      33 |         12 | SLOW |                     |            FP_VTT_50 |         | FIXED      |           |          |      | NONE             |              |                   |              |
 | Y1         |                  |            | PS_DDR_DQ31_502         | PSS IO      |             |         |            |      |                     |                      |         |            |           |          |      |                  |              |                   |              |
 | Y2         |                  |            | GND                     | GND         |             |         |            |      |                     |                      |     0.0 |            |           |          |      |                  |              |                   |              |
 | Y3         |                  |            | PS_DDR_DQ29_502         | PSS IO      |             |         |            |      |                     |                      |         |            |           |          |      |                  |              |                   |              |

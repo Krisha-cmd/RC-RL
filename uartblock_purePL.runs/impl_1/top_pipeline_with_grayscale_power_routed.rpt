@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2025.1 (win64) Build 6140274 Thu May 22 00:12:29 MDT 2025
-| Date             : Wed Nov 26 15:10:25 2025
+| Date             : Wed Nov 26 15:27:03 2025
 | Host             : BOOK-JBCPDRK7D5 running 64-bit major release  (build 9200)
 | Command          : report_power -file top_pipeline_with_grayscale_power_routed.rpt -pb top_pipeline_with_grayscale_power_summary_routed.pb -rpx top_pipeline_with_grayscale_power_routed.rpx
 | Design           : top_pipeline_with_grayscale
@@ -30,10 +30,10 @@ Table of Contents
 ----------
 
 +--------------------------+----------------------------------+
-| Total On-Chip Power (W)  | 10.030 (Junction temp exceeded!) |
+| Total On-Chip Power (W)  | 11.601 (Junction temp exceeded!) |
 | Design Power Budget (W)  | Unspecified*                     |
 | Power Budget Margin (W)  | NA                               |
-| Dynamic (W)              | 8.981                            |
+| Dynamic (W)              | 10.551                           |
 | Device Static (W)        | 1.049                            |
 | Effective TJA (C/W)      | 11.5                             |
 | Max Ambient (C)          | 0.0                              |
@@ -52,17 +52,17 @@ Table of Contents
 +----------------+-----------+----------+-----------+-----------------+
 | On-Chip        | Power (W) | Used     | Available | Utilization (%) |
 +----------------+-----------+----------+-----------+-----------------+
-| Slice Logic    |     4.147 |     1451 |       --- |             --- |
-|   LUT as Logic |     3.321 |      514 |     53200 |            0.97 |
-|   CARRY4       |     0.529 |      125 |     13300 |            0.94 |
-|   Register     |     0.291 |      666 |    106400 |            0.63 |
+| Slice Logic    |     4.993 |     1739 |       --- |             --- |
+|   LUT as Logic |     3.996 |      647 |     53200 |            1.22 |
+|   CARRY4       |     0.642 |      144 |     13300 |            1.08 |
+|   Register     |     0.349 |      777 |    106400 |            0.73 |
 |   BUFG         |     0.006 |        1 |        32 |            3.13 |
-|   Others       |     0.000 |       29 |       --- |             --- |
-| Signals        |     4.049 |     1217 |       --- |             --- |
-| Block RAM      |     0.777 |        5 |       140 |            3.57 |
-| I/O            |     0.008 |        8 |       200 |            4.00 |
+|   Others       |     0.000 |       33 |       --- |             --- |
+| Signals        |     4.778 |     1412 |       --- |             --- |
+| Block RAM      |     0.772 |        5 |       140 |            3.57 |
+| I/O            |     0.008 |       10 |       200 |            5.00 |
 | Static Power   |     1.049 |          |           |                 |
-| Total          |    10.030 |          |           |                 |
+| Total          |    11.601 |          |           |                 |
 +----------------+-----------+----------+-----------+-----------------+
 
 
@@ -72,7 +72,7 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
-| Vccint    |       1.000 |     9.220 |       8.918 |      0.301 |       NA    | Unspecified | NA         |
+| Vccint    |       1.000 |    10.791 |      10.489 |      0.301 |       NA    | Unspecified | NA         |
 | Vccaux    |       1.800 |     0.100 |       0.000 |      0.100 |       NA    | Unspecified | NA         |
 | Vcco33    |       3.300 |     0.001 |       0.000 |      0.001 |       NA    | Unspecified | NA         |
 | Vcco25    |       2.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
@@ -146,20 +146,22 @@ Table of Contents
 +-----------------------------+-----------+
 | Name                        | Power (W) |
 +-----------------------------+-----------+
-| top_pipeline_with_grayscale |     8.981 |
-|   assembler1                |     0.190 |
-|   assembler2                |     0.429 |
-|   fifo1                     |     1.695 |
-|     bram_inst               |     0.475 |
-|   fifo2                     |     1.986 |
-|     bram_inst               |     0.517 |
-|   fifo3                     |     1.158 |
-|     bram_inst               |     0.154 |
-|   gray_inst                 |     0.908 |
-|   resizer_inst              |     0.328 |
-|   rx_inst                   |     0.830 |
-|   splitter_inst             |     0.137 |
-|   tx_inst                   |     0.493 |
+| top_pipeline_with_grayscale |    10.551 |
+|   assembler1                |     0.207 |
+|   assembler2                |     0.446 |
+|   blur_inst                 |     0.611 |
+|   diffamp_inst              |     0.347 |
+|   fifo1                     |     1.741 |
+|     bram_inst               |     0.462 |
+|   fifo2                     |     2.005 |
+|     bram_inst               |     0.544 |
+|   fifo3                     |     1.186 |
+|     bram_inst               |     0.145 |
+|   gray_inst                 |     0.906 |
+|   resizer_inst              |     0.334 |
+|   rx_inst                   |     0.851 |
+|   splitter_inst             |     0.158 |
+|   tx_inst                   |     0.499 |
 +-----------------------------+-----------+
 
 

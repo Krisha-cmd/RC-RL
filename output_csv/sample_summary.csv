@@ -13,3 +13,5 @@ id,input_name,bytes_sent,bytes_received,duration_s,output_image_path,mode,succes
 2,sample.jpeg,49152,125,34.370852,output\sample_2.jpeg,length,True,2025-11-26T13:50:11,
 2,sample.jpeg,49152,798,34.354698,output\sample_2.jpeg,length,True,2025-11-26T14:04:19,
 2,sample.jpeg,49152,4096,14.455889,output\sample_2.jpeg,length,True,2025-11-26T14:55:45,
+2,sample.jpeg,49152,4096,14.340796,output\sample_2.jpeg,length,True,2025-11-26T15:18:15,
+2,sample.jpeg,49152,4094,34.32375,output\sample_2.jpeg,length,True,2025-11-26T15:29:08,

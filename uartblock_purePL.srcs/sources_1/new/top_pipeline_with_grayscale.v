@@ -1,7 +1,8 @@
 `timescale 1ns / 1ps
 // top_pipeline_with_grayscale.v
-// Pipeline: RX -> FIFO1 -> assembler1 -> resizer -> splitter -> FIFO2 -> assembler2 -> grayscale -> FIFO3 -> TX
-// Complete pipeline with resizer (128x128 RGB -> 64x64 RGB) and grayscale (64x64 RGB -> 64x64 Gray)
+// Pipeline: RX -> FIFO1 -> assembler1 -> resizer -> splitter -> FIFO2 -> assembler2 -> grayscale -> diff_amp -> blur -> FIFO3 -> TX
+// Complete pipeline with resizer (128x128 RGB -> 64x64 RGB), grayscale (64x64 RGB -> 64x64 Gray),
+// difference amplifier (contrast enhancement), and 1D box blur (smoothing)
 // Single clock domain, no RL throttling for reliable throughput.
 
 module top_pipeline_with_grayscale #(
@@ -11,7 +12,8 @@ module top_pipeline_with_grayscale #(
     parameter integer IN_HEIGHT   = 128,
     parameter integer FIFO1_DEPTH = 8192,
     parameter integer FIFO2_DEPTH = 8192,
-    parameter integer FIFO3_DEPTH = 4096
+    parameter integer FIFO3_DEPTH = 4096,
+    parameter integer DIFF_AMP_GAIN = 3
 )(
     input  wire clk,
     input  wire rst,
@@ -20,7 +22,9 @@ module top_pipeline_with_grayscale #(
     output wire led_rx_activity,
     output wire led_tx_activity,
     output wire led_resizer_busy,
-    output wire led_gray_busy
+    output wire led_gray_busy,
+    output wire led_diffamp_busy,
+    output wire led_blur_busy
 );
 
     function integer clog2;
@@ -304,7 +308,81 @@ module top_pipeline_with_grayscale #(
     
     assign led_gray_busy = led_gray_r;
 
-    // FIFO3 - stores grayscale bytes
+    // Difference Amplifier - contrast enhancement
+    wire diffamp_write;
+    wire [7:0] diffamp_byte;
+    wire diffamp_busy;
+    wire diffamp_read;
+    reg [22:0] diffamp_led_cnt;
+    reg led_diffamp_r;
+    
+    assign diffamp_read = gray_write;
+    
+    difference_amplifier #(
+        .PIXEL_WIDTH(PIXEL_WIDTH),
+        .GAIN(DIFF_AMP_GAIN)
+    ) diffamp_inst (
+        .clk(clk),
+        .rst(rst),
+        .read_signal(diffamp_read),
+        .data_in(gray_byte),
+        .data_out(diffamp_byte),
+        .write_signal(diffamp_write),
+        .state(diffamp_busy)
+    );
+    
+    always @(posedge clk) begin
+        if (rst) begin
+            diffamp_led_cnt <= 0;
+            led_diffamp_r <= 1'b0;
+        end else if (diffamp_busy) begin
+            diffamp_led_cnt <= LED_PULSE_CYCLES;
+        end else if (diffamp_led_cnt != 0) begin
+            diffamp_led_cnt <= diffamp_led_cnt - 1;
+        end
+        led_diffamp_r <= (diffamp_led_cnt != 0);
+    end
+    
+    assign led_diffamp_busy = led_diffamp_r;
+
+    // 1D Box Blur - smoothing filter
+    wire blur_write;
+    wire [7:0] blur_byte;
+    wire blur_busy;
+    wire blur_read;
+    reg [22:0] blur_led_cnt;
+    reg led_blur_r;
+    
+    assign blur_read = diffamp_write;
+    
+    box_blur_1d #(
+        .PIXEL_WIDTH(PIXEL_WIDTH),
+        .IMG_WIDTH(IN_WIDTH/2)  // 64x64 image after resizer
+    ) blur_inst (
+        .clk(clk),
+        .rst(rst),
+        .read_signal(blur_read),
+        .data_in(diffamp_byte),
+        .data_out(blur_byte),
+        .write_signal(blur_write),
+        .state(blur_busy)
+    );
+    
+    always @(posedge clk) begin
+        if (rst) begin
+            blur_led_cnt <= 0;
+            led_blur_r <= 1'b0;
+        end else if (blur_busy) begin
+            blur_led_cnt <= LED_PULSE_CYCLES;
+        end else if (blur_led_cnt != 0) begin
+            blur_led_cnt <= blur_led_cnt - 1;
+        end
+        led_blur_r <= (blur_led_cnt != 0);
+    end
+    
+    assign led_blur_busy = led_blur_r;
+
+    // FIFO3 - stores final processed grayscale bytes
     wire fifo3_rd_valid;
     wire [7:0] fifo3_rd_data;
     wire fifo3_rd_ready;
@@ -317,9 +395,9 @@ module top_pipeline_with_grayscale #(
     ) fifo3 (
         .wr_clk(clk),
         .wr_rst(rst),
-        .wr_valid(gray_write),
+        .wr_valid(blur_write),
         .wr_ready(fifo3_wr_ready),
-        .wr_data(gray_byte),
+        .wr_data(blur_byte),
         .rd_clk(clk),
         .rd_rst(rst),
         .rd_valid(fifo3_rd_valid),

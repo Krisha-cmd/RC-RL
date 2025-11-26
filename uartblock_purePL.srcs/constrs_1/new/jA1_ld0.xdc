@@ -26,3 +26,8 @@ set_property IOSTANDARD LVCMOS33 [get_ports led_resizer_busy]
 set_property IOSTANDARD LVCMOS33 [get_ports led_rx_activity]
 set_property IOSTANDARD LVCMOS33 [get_ports led_tx_activity]
 set_property IOSTANDARD LVCMOS33 [get_ports rst]
+
+set_property PACKAGE_PIN U21 [get_ports led_blur_busy]
+set_property PACKAGE_PIN W22 [get_ports led_diffamp_busy]
+set_property IOSTANDARD LVCMOS33 [get_ports led_blur_busy]
+set_property IOSTANDARD LVCMOS33 [get_ports led_diffamp_busy]

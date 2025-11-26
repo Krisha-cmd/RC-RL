@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GenRun Id="impl_1" LaunchPart="xc7z020clg484-1" LaunchTime="1764149970">
+<GenRun Id="impl_1" LaunchPart="xc7z020clg484-1" LaunchTime="1764150966">
   <File Type="PA-TCL" Name="top_pipeline_with_grayscale.tcl"/>
   <File Type="REPORTS-TCL" Name="top_pipeline_with_grayscale_reports.tcl"/>
   <File Type="INIT-TIMING" Name="top_pipeline_with_grayscale_timing_summary_init.rpt"/>
@@ -113,6 +113,13 @@
   <File Type="POSTROUTE-PHYSOPT-RQS-RPT" Name="postroute_physopt_report_qor_suggestions_0.rpt"/>
   <FileSet Name="sources" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1" RelGenDir="$PGENDIR/sources_1">
     <Filter Type="Srcs"/>
+    <File Path="$PSRCDIR/sources_1/new/box_blur_1d.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
     <File Path="$PSRCDIR/sources_1/new/bram11.v">
       <FileInfo>
         <Attr Name="UsedIn" Val="synthesis"/>
@@ -121,6 +128,13 @@
       </FileInfo>
     </File>
     <File Path="$PSRCDIR/sources_1/new/bram_fifo.v">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/difference_amplifier.v">
       <FileInfo>
         <Attr Name="UsedIn" Val="synthesis"/>
         <Attr Name="UsedIn" Val="implementation"/>

@@ -1,0 +1,2 @@
+id,input_name,bytes_sent,bytes_received,duration_s,output_image_path,mode,success,timestamp,logger_entries
+3,test_cyan_yellow.png,49152,4096,14.352813,output\test_cyan_yellow_3.png,length,True,2025-11-26T15:18:29,

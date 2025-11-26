@@ -18,3 +18,5 @@ id,input_name,bytes_sent,bytes_received,duration_s,output_image_path,mode,succes
 1,image.png,49152,852,34.376947,output\image_1.png,length,True,2025-11-26T14:01:58,
 1,image.png,49152,807,34.392222,output\image_1.png,length,True,2025-11-26T14:03:45,
 1,image.png,49152,4096,14.414695,output\image_1.png,length,True,2025-11-26T14:55:31,
+1,image.png,49152,4096,14.371302,output\image_1.png,length,True,2025-11-26T15:18:01,
+1,image.png,49152,4094,34.401002,output\image_1.png,length,True,2025-11-26T15:28:34,
