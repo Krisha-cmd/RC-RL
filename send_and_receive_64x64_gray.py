@@ -131,7 +131,7 @@ def main():
     # Hardcoded configuration - edit these values as needed
     PORT = 'COM4'
     BAUD = 115200
-    INFILE = 'input/image.png'  # path relative to repo root
+    INFILE = 'input/sample.jpeg'  # path relative to repo root
     OUT_DIR = 'output'
     WIDTH = 128
     HEIGHT = 128
