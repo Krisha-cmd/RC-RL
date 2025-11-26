@@ -183,3 +183,8 @@
     <Process Command="vivado.bat" Owner="iamri" Host="BOOK-JBCPDRK7D5" Pid="17696" HostCore="16" HostMemory="016854822912">
     </Process>
 </ProcessHandle>
+<?xml version="1.0"?>
+<ProcessHandle Version="1" Minor="0">
+    <Process Command="vivado.bat" Owner="iamri" Host="BOOK-JBCPDRK7D5" Pid="22524" HostCore="16" HostMemory="016854822912">
+    </Process>
+</ProcessHandle>

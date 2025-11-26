@@ -21,3 +21,4 @@
 # Total Virtual      : 62004 MB
 # Available Virtual  : 35400 MB
 #-----------------------------------------------------------
+source top_pipeline_with_grayscale.tcl -notrace
