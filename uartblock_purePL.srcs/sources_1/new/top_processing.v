@@ -24,7 +24,9 @@ module top_processing #(
     parameter integer FIFO3_DEPTH = 4096,
     // logger
     parameter integer LOGGER_INTERVAL = 20,
-    parameter integer LOGGER_DEPTH    = 4096
+    parameter integer LOGGER_DEPTH    = 4096,
+    // If set to 1, logger records continuously (useful for debugging)
+    parameter integer LOG_ALWAYS      = 1
 )(
     input  wire clk,          // map this to Y9 on ZedBoard (100MHz)
     input  wire rst,          
@@ -67,7 +69,7 @@ module top_processing #(
 
     rx rx_inst (
         .clk(clk),
-        .rst_n(rst),
+        .rst(rst),
         .rx(uart_rx),
         .rx_byte(rx_byte),
         .rx_byte_valid(rx_byte_valid)
@@ -83,7 +85,7 @@ module top_processing #(
         .BAUD_RATE(115200)
     ) tx_inst (
         .clk(clk),
-        .rst_n(rst),
+        .rst(rst),
         .tx(uart_tx),
         .tx_start(tx_start_reg),
         .tx_data(tx_data_reg),
@@ -91,8 +93,85 @@ module top_processing #(
     );
 
     // LEDs reflect current activity/state
-    assign led_rx_activity = rx_byte_valid;
-    assign led_tx_activity = tx_busy;
+    // LED pulse stretchers so short pulses are visible on LEDs
+    localparam integer LED_PULSE_CYCLES = 500000; // ~5ms at 100MHz
+    reg [22:0] rx_led_cnt;
+    reg [22:0] tx_led_cnt;
+    reg led_rx_r;
+    reg led_tx_r;
+    reg tx_busy_prev;
+    reg [22:0] resizer_led_cnt;
+    reg [22:0] gray_led_cnt;
+    reg led_resizer_r;
+    reg led_gray_r;
+
+    // stretch RX pulse
+    always @(posedge clk) begin
+        if (rst) begin
+            rx_led_cnt <= 0;
+            led_rx_r <= 1'b0;
+        end else begin
+            if (rx_byte_valid)
+                rx_led_cnt <= LED_PULSE_CYCLES;
+            else if (rx_led_cnt != 0)
+                rx_led_cnt <= rx_led_cnt - 1;
+            led_rx_r <= (rx_led_cnt != 0);
+        end
+    end
+
+    // stretch TX activity: trigger on tx_start pulse or rising edge of tx_busy
+    always @(posedge clk) begin
+        if (rst) begin
+            tx_led_cnt <= 0;
+            led_tx_r <= 1'b0;
+            tx_busy_prev <= 1'b0;
+        end else begin
+            // force LED off when FSM idle and transmitter idle
+            if ((tx_state == S_IDLE) && (!tx_busy)) begin
+                tx_led_cnt <= 0;
+                led_tx_r <= 1'b0;
+                tx_busy_prev <= tx_busy;
+            end else begin
+                // detect rising edge of tx_busy or any tx_start pulse
+                if (tx_start_reg || (tx_busy && !tx_busy_prev)) begin
+                    tx_led_cnt <= LED_PULSE_CYCLES;
+                end else if (tx_led_cnt != 0) begin
+                    tx_led_cnt <= tx_led_cnt - 1;
+                end
+                led_tx_r <= (tx_led_cnt != 0);
+                tx_busy_prev <= tx_busy;
+            end
+        end
+    end
+
+    assign led_rx_activity = led_rx_r;
+    assign led_tx_activity = led_tx_r;
+        // stretch resizer and grayscale 'state' signals for visibility
+        always @(posedge clk) begin
+            if (rst) begin
+                resizer_led_cnt <= 0;
+                gray_led_cnt <= 0;
+                led_resizer_r <= 1'b0;
+                led_gray_r <= 1'b0;
+            end else begin
+                if (resizer_state)
+                    resizer_led_cnt <= LED_PULSE_CYCLES;
+                else if (resizer_led_cnt != 0)
+                    resizer_led_cnt <= resizer_led_cnt - 1;
+                // show only stretched activity (avoid direct CE/state OR to prevent
+                // blinking when CE pulses without actual work)
+                led_resizer_r <= (resizer_led_cnt != 0);
+
+                if (gray_state_wire) // grayscale core state
+                    gray_led_cnt <= LED_PULSE_CYCLES;
+                else if (gray_led_cnt != 0)
+                    gray_led_cnt <= gray_led_cnt - 1;
+                led_gray_r <= (gray_led_cnt != 0);
+            end
+        end
+
+        assign led_resizer_busy = led_resizer_r;
+        assign led_gray_busy = led_gray_r;
 
     // ------------------------------------------------------------------------
     // FIFO1: RX bytes -> assembler1 (single-clock BRAM FIFO)
@@ -106,13 +185,13 @@ module top_processing #(
 
     bram_fifo #(.DEPTH(FIFO1_DEPTH), .ADDR_WIDTH(ADDR_W_FIFO1)) fifo1 (
         .wr_clk(clk),
-        .wr_rst_n(rst),
+        .wr_rst(rst),
         .wr_valid(rx_byte_valid),
         .wr_ready(fifo1_wr_ready),
         .wr_data(rx_byte),
 
         .rd_clk(clk),
-        .rd_rst_n(rst),
+        .rd_rst(rst),
         .rd_valid(fifo1_rd_valid),
         .rd_ready(fifo1_rd_ready),                // connected to assembler1 below via fifo1_rd_ready
         .rd_data(fifo1_rd_data),
@@ -130,7 +209,7 @@ module top_processing #(
 
     pixel_assembler #(.PIXEL_WIDTH(PIXEL_WIDTH), .CHANNELS(CHANNELS)) assembler1 (
         .clk(clk),
-        .rst_n(rst),
+        .rst(rst),
         .bram_rd_valid(fifo1_rd_valid),
         .bram_rd_ready(fifo1_rd_ready),
         .bram_rd_data(fifo1_rd_data),
@@ -148,12 +227,22 @@ module top_processing #(
     wire                            res_valid;
     wire                            res_frame_done;
     wire                            resizer_state;
+    wire                            gray_state_wire;
+
+    // RL / clock wires (allow RL agent to change core pacing)
+    wire rl_valid;
+    wire [1:0] rl_core_mask;
+    wire [7:0] rl_freq_code;
+    wire ce_resizer;
+    wire ce_grayscale;
+    wire [7:0] divider_resizer_wire;
+    wire [7:0] divider_grayscale_wire;
 
     // assembler1 always ready
     assign pixel1_ready = 1'b1;
 
-    // read pulse when pixel available
-    wire resizer_read_pulse = pixel1_valid & pixel1_ready;
+    // read pulse when pixel available and when resizer CE allows it
+    wire resizer_read_pulse = pixel1_valid & pixel1_ready & ce_resizer;
 
     resizer_core #(
         .IN_WIDTH(IN_WIDTH),
@@ -164,7 +253,7 @@ module top_processing #(
         .CHANNELS(CHANNELS)
     ) resizer_inst (
         .clk(clk),
-        .rst_n(rst),
+        .rst(rst),
         .data_in(pixel1),
         .read_signal(resizer_read_pulse),
         .data_out(res_out_pixel),
@@ -173,8 +262,7 @@ module top_processing #(
         .state(resizer_state)
     );
 
-    // LED shows resizer core state directly
-    assign led_resizer_busy = resizer_state;
+    // (led_resizer_busy driven below from stretcher)
 
     // ------------------------------------------------------------------------
     // Pixel Splitter -> FIFO2 (single-clock)
@@ -185,7 +273,7 @@ module top_processing #(
 
     pixel_splitter #(.PIXEL_WIDTH(PIXEL_WIDTH), .CHANNELS(CHANNELS)) splitter_inst (
         .clk(clk),
-        .rst_n(rst),
+        .rst(rst),
         .pixel_in(res_out_pixel),
         .pixel_in_valid(res_valid),
         .pixel_in_ready(),    // not used
@@ -202,13 +290,13 @@ module top_processing #(
     wire pixel2_ready;
     bram_fifo #(.DEPTH(FIFO2_DEPTH), .ADDR_WIDTH(ADDR_W_FIFO2)) fifo2 (
         .wr_clk(clk),
-        .wr_rst_n(rst),
+        .wr_rst(rst),
         .wr_valid(splitter_wr_valid),
         .wr_ready(fifo2_wr_ready),
         .wr_data(splitter_wr_data),
 
         .rd_clk(clk),
-        .rd_rst_n(rst),
+        .rd_rst(rst),
         .rd_valid(fifo2_rd_valid),
         .rd_ready(pixel2_ready),                // assembler2 will provide ready
         .rd_data(fifo2_rd_data),
@@ -229,7 +317,7 @@ module top_processing #(
 
     pixel_assembler #(.PIXEL_WIDTH(PIXEL_WIDTH), .CHANNELS(CHANNELS)) assembler2 (
         .clk(clk),
-        .rst_n(rst),
+        .rst(rst),
         .bram_rd_valid(fifo2_rd_valid),
         .bram_rd_ready(fifo2_rd_ready),
         .bram_rd_data(fifo2_rd_data),
@@ -244,7 +332,8 @@ module top_processing #(
     // ------------------------------------------------------------------------
     // Grayscale – read when input pixel is valid
     // ------------------------------------------------------------------------
-    wire gray_read_pulse = pixel2_valid & pixel2_ready;
+    // only read grayscale when both pixel available and CE pulse asserted
+    wire gray_read_pulse = pixel2_valid & pixel2_ready & ce_grayscale;
 
     // grayscale outputs
     wire [7:0] gray_byte;
@@ -256,12 +345,12 @@ module top_processing #(
         .PIXEL_WIDTH(PIXEL_WIDTH)
     ) grayscale_inst (
         .clk(clk),
-        .rst_n(rst),
+        .rst(rst),
         .data_in(pixel2),
         .read_signal(gray_read_pulse),
         .data_out(gray_byte),
         .write_signal(gray_valid),
-        .state(led_gray_busy)
+        .state(gray_state_wire)
     );
 
 
@@ -272,16 +361,15 @@ module top_processing #(
     wire fifo3_rd_valid;
     wire [7:0] fifo3_rd_data;
     wire [2:0] fifo3_load_bucket;
-
     bram_fifo #(.DEPTH(FIFO3_DEPTH), .ADDR_WIDTH(ADDR_W_FIFO3)) fifo3 (
         .wr_clk(clk),
-        .wr_rst_n(rst),
+        .wr_rst(rst),
         .wr_valid(gray_valid),
         .wr_ready(fifo3_wr_ready),
         .wr_data(gray_byte),
 
         .rd_clk(clk),
-        .rd_rst_n(rst),
+        .rd_rst(rst),
         .rd_valid(fifo3_rd_valid),
         .rd_ready(fifo3_rd_ready_reg),
         .rd_data(fifo3_rd_data),
@@ -291,25 +379,140 @@ module top_processing #(
     );
 
     // ------------------------------------------------------------------------
-    // TX: stream bytes from FIFO3 to UART TX when ready
+    // (Logger removed in this build — focusing on image forward path and TX)
     // ------------------------------------------------------------------------
-    reg fifo3_rd_ready_reg;
 
+    // Instantiate RL agent and clock module so RL can change dividers at runtime.
+    rl_agent_simple #(.INTERVAL(2000000)) rl_agent_inst (
+        .clk(clk),
+        .rst(rst),
+        .rl_valid(rl_valid),
+        .core_mask(rl_core_mask),
+        .freq_code(rl_freq_code)
+    );
+
+    clock_module_simple clock_module_inst (
+        .clk(clk),
+        .rst(rst),
+        .rl_valid(rl_valid),
+        .core_mask(rl_core_mask),
+        .freq_code(rl_freq_code),
+        .ce_resizer(ce_resizer),
+        .ce_grayscale(ce_grayscale),
+        .divider_resizer(divider_resizer_wire),
+        .divider_grayscale(divider_grayscale_wire)
+    );
+
+    // ------------------------------------------------------------------------
+    // TX FSM (single-clock). Consumes fifo3_rd_valid and sends bytes via tx_inst.
+    // After streaming image bytes it sends marker "/0/0" then flushes logger contents
+    // (logger_inst read) and then sends trailing marker.
+    // ------------------------------------------------------------------------
+
+    // FSM state encodings
+    localparam S_IDLE     = 4'd0;
+    localparam S_STREAM   = 4'd1;
+
+    localparam S_MARK1_0  = 4'd2;
+    localparam S_MARK1_1  = 4'd3;
+    localparam S_MARK1_2  = 4'd4;
+    localparam S_MARK1_3  = 4'd5;
+
+    // (logger states removed)
+
+    localparam S_MARK2_0  = 4'd10;
+    localparam S_MARK2_1  = 4'd11;
+    localparam S_MARK2_2  = 4'd12;
+    localparam S_MARK2_3  = 4'd13;
+    // self-test transmit state
+    localparam S_SELF = 4'd14;
+
+    reg [3:0] tx_state;
+    reg fifo3_rd_ready_reg;
+    reg [7:0] fifo3_latched;
+    reg fifo3_latched_valid;
+    // self-test request and index
+    reg selftest_req;
+    reg [2:0] self_idx;
+
+    // TX FSM sequential logic
     always @(posedge clk) begin
         if (rst) begin
+            tx_state <= S_IDLE;
             tx_start_reg <= 1'b0;
             tx_data_reg <= 8'h00;
             fifo3_rd_ready_reg <= 1'b0;
+            fifo3_latched <= 8'h00;
+            fifo3_latched_valid <= 1'b0;
+            selftest_req <= 1'b0;
+            self_idx <= 3'd0;
         end else begin
-            // defaults each clock
-            tx_start_reg <= 1'b0;
-            fifo3_rd_ready_reg <= 1'b0;
+                // defaults each clock
+                tx_start_reg <= 1'b0;
+                // Drive FIFO read-ready whenever FIFO has data and we haven't latched it yet.
+                fifo3_rd_ready_reg <= (fifo3_rd_valid && !fifo3_latched_valid);
 
-            if (!tx_busy && fifo3_rd_valid) begin
-                tx_data_reg <= fifo3_rd_data;
-                tx_start_reg <= 1'b1;
-                fifo3_rd_ready_reg <= 1'b1;
+            // capture self-test request from RX (press 'T' to trigger)
+            if (rx_byte_valid && rx_byte == 8'h54) begin
+                selftest_req <= 1'b1;
             end
+
+            case (tx_state)
+                S_IDLE: begin
+                    if (selftest_req) begin
+                        tx_state <= S_SELF;
+                        self_idx <= 3'd0;
+                    end else if (fifo3_rd_valid) begin
+                        // don't pulse extra rd_ready here; the default above already
+                        // asserts rd_ready when fifo3_rd_valid && !fifo3_latched_valid
+                        tx_state <= S_STREAM;
+                    end
+                end
+
+                S_STREAM: begin
+                    if (fifo3_rd_valid && !fifo3_latched_valid) begin
+                        fifo3_latched <= fifo3_rd_data;
+                        fifo3_latched_valid <= 1'b1;
+                    end
+                    if (fifo3_latched_valid && !tx_busy) begin
+                        tx_data_reg <= fifo3_latched;
+                        tx_start_reg <= 1'b1;
+                        fifo3_latched_valid <= 1'b0;
+                    end
+                    // if FIFO empty and no in-flight byte, finish streaming
+                    if (!fifo3_rd_valid && !fifo3_latched_valid) begin
+                        tx_state <= S_MARK1_0;
+                    end
+                end
+
+                // send "/0/0"
+                S_MARK1_0: if (!tx_busy) begin tx_data_reg<=8'h2F; tx_start_reg<=1'b1; tx_state<=S_MARK1_1; end
+                S_MARK1_1: if (!tx_busy) begin tx_data_reg<=8'h30; tx_start_reg<=1'b1; tx_state<=S_MARK1_2; end
+                S_MARK1_2: if (!tx_busy) begin tx_data_reg<=8'h2F; tx_start_reg<=1'b1; tx_state<=S_MARK1_3; end
+                S_MARK1_3: if (!tx_busy) begin tx_data_reg<=8'h30; tx_start_reg<=1'b1; tx_state<=S_MARK2_0; end
+
+                // Self-test send sequence: "TEST\n" (ascii)
+                S_SELF: begin
+                    if (!tx_busy) begin
+                        case (self_idx)
+                            3'd0: begin tx_data_reg <= 8'h54; tx_start_reg <= 1'b1; self_idx <= 3'd1; end // 'T'
+                            3'd1: begin tx_data_reg <= 8'h45; tx_start_reg <= 1'b1; self_idx <= 3'd2; end // 'E'
+                            3'd2: begin tx_data_reg <= 8'h53; tx_start_reg <= 1'b1; self_idx <= 3'd3; end // 'S'
+                            3'd3: begin tx_data_reg <= 8'h54; tx_start_reg <= 1'b1; self_idx <= 3'd4; end // 'T'
+                            3'd4: begin tx_data_reg <= 8'h0A; tx_start_reg <= 1'b1; self_idx <= 3'd0; selftest_req <= 1'b0; tx_state <= S_IDLE; end // '\n'
+                            default: begin selftest_req <= 1'b0; tx_state <= S_IDLE; end
+                        endcase
+                    end
+                end
+
+                // trailing marker
+                S_MARK2_0: if (!tx_busy) begin tx_data_reg<=8'h2F; tx_start_reg<=1'b1; tx_state<=S_MARK2_1; end
+                S_MARK2_1: if (!tx_busy) begin tx_data_reg<=8'h30; tx_start_reg<=1'b1; tx_state<=S_MARK2_2; end
+                S_MARK2_2: if (!tx_busy) begin tx_data_reg<=8'h2F; tx_start_reg<=1'b1; tx_state<=S_MARK2_3; end
+                S_MARK2_3: if (!tx_busy) begin tx_data_reg<=8'h30; tx_start_reg<=1'b1; tx_state<=S_IDLE; end
+
+                default: tx_state <= S_IDLE;
+            endcase
         end
     end
 

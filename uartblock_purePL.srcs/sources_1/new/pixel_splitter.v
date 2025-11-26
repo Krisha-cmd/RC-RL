@@ -4,7 +4,7 @@ module pixel_splitter #(
     parameter integer CHANNELS = 3
 )(
     input  wire clk,
-    input  wire rst_n,
+    input  wire rst,
     // Resizer output
     input  wire [CHANNELS*PIXEL_WIDTH-1:0] pixel_in,
     input  wire pixel_in_valid,
@@ -17,8 +17,8 @@ module pixel_splitter #(
     reg [1:0] state;
     reg [CHANNELS*PIXEL_WIDTH-1:0] pixel_reg;
 
-    always @(posedge clk or posedge rst_n) begin
-        if (rst_n==1'b1) begin
+    always @(posedge clk or posedge rst) begin
+        if (rst==1'b1) begin
             state <= 0;
             bram_wr_valid <= 0;
             bram_wr_data <= 0;

@@ -5,14 +5,14 @@ module bram_fifo #(
 )(
     // Write port (producer domain)
     input  wire                 wr_clk,
-    input  wire                 wr_rst_n,
+    input  wire                 wr_rst,
     input  wire                 wr_valid,
     output reg                  wr_ready,
     input  wire [7:0]           wr_data,
 
     // Read port (consumer domain)
     input  wire                 rd_clk,
-    input  wire                 rd_rst_n,
+    input  wire                 rd_rst,
     output reg                  rd_valid,
     input  wire                 rd_ready,
     output reg  [7:0]           rd_data,
@@ -89,8 +89,8 @@ module bram_fifo #(
     // ----------------------------------------------
 
     // Sync read pointer into write domain
-    always @(posedge wr_clk or posedge wr_rst_n) begin
-        if (wr_rst_n==1'b1) begin
+    always @(posedge wr_clk or posedge wr_rst) begin
+        if (wr_rst==1'b1) begin
             rd_ptr_gray_sync1 <= 0;
             rd_ptr_gray_sync2 <= 0;
         end else begin
@@ -117,8 +117,8 @@ module bram_fifo #(
         end
     end
 
-    always @(posedge wr_clk or posedge wr_rst_n) begin
-        if (wr_rst_n==1) begin
+    always @(posedge wr_clk or posedge wr_rst) begin
+        if (wr_rst==1) begin
             wr_ptr_bin <= 0;
             wr_ptr_gray <= 0;
         end else begin
@@ -131,8 +131,8 @@ module bram_fifo #(
     // READ SIDE
     // ----------------------------------------------
 
-    always @(posedge rd_clk or posedge rd_rst_n) begin
-        if (rd_rst_n==1'b1) begin
+    always @(posedge rd_clk or posedge rd_rst) begin
+        if (rd_rst==1'b1) begin
             wr_ptr_gray_sync1 <= 0;
             wr_ptr_gray_sync2 <= 0;
         end else begin
@@ -148,8 +148,8 @@ module bram_fifo #(
         rd_data = bram_rd_dout;
     end
 
-    always @(posedge rd_clk or posedge rd_rst_n) begin
-        if (rd_rst_n==1'b1) begin
+    always @(posedge rd_clk or posedge rd_rst) begin
+        if (rd_rst==1'b1) begin
             rd_ptr_bin <= 0;
             rd_ptr_gray <= 0;
         end else if (rd_valid && rd_ready) begin
@@ -165,8 +165,8 @@ module bram_fifo #(
     assign wr_count_sync = wr_ptr_bin - rd_ptr_bin_synced;
     assign rd_count_sync = wr_ptr_bin_synced - rd_ptr_bin;
 
-    always @(posedge wr_clk or posedge wr_rst_n) begin
-        if (wr_rst_n==1'b1) begin
+    always @(posedge wr_clk or posedge wr_rst) begin
+        if (wr_rst==1'b1) begin
             load_bucket <= 3'd0;
         end else begin
             // bucket = top 3 bits of count

@@ -1,0 +1,11 @@
+id,input_name,bytes_sent,bytes_received,duration_s,output_image_path,mode,success,timestamp,logger_entries
+1,image.png,49152,4096,14.382561,output\image_1.png,length,True,2025-11-25T17:34:42,
+1,image.png,49152,4096,14.364269,output\image_1.png,length,True,2025-11-25T17:37:15,
+1,image.png,49152,4096,14.363749,output\image_1.png,length,True,2025-11-25T17:38:01,
+1,image.png,49152,4096,14.388483,output\image_1.png,length,True,2025-11-25T17:53:48,
+1,image.png,49152,0,34.421373,output\image_1.png,length,True,2025-11-26T09:55:25,
+1,image.png,49152,4096,14.38031,output\image_1.png,length,True,2025-11-26T09:57:00,
+1,image.png,49152,4096,14.378183,output\image_1.png,length,True,2025-11-26T09:57:58,
+1,image.png,49152,225,34.385946,output\image_1.png,length,True,2025-11-26T11:16:16,
+1,image.png,49152,300,34.407139,output\image_1.png,length,True,2025-11-26T12:52:59,
+1,image.png,49152,260,34.387487,output\image_1.png,length,True,2025-11-26T13:00:47,

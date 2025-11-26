@@ -28,7 +28,7 @@ module uart_receiver_module #(
     parameter integer BAUD_RATE  = 115200
 )(
     input  wire        clk,        // system clock (100 MHz recommended)
-    input  wire        rst_n,      // active low reset
+    input  wire        rst,      // active low reset
     input  wire        rx,         // serial input (UART TX from adapter -> this rx)
     output reg  [7:0]  rx_byte,    // received byte
     output reg         rx_byte_valid // 1-clock pulse when rx_byte is valid
@@ -55,8 +55,8 @@ module uart_receiver_module #(
     wire sample_tick = (clk_div_cnt == 0);
 
     // Sync rx to clock domain
-    always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
+    always @(posedge clk or posedge rst) begin
+        if (rst==1'b1) begin
             rx_sync0 <= 1'b1;
             rx_sync1 <= 1'b1;
         end else begin
@@ -66,8 +66,8 @@ module uart_receiver_module #(
     end
 
     // clock divider for oversample ticks
-    always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
+    always @(posedge clk or posedge rst) begin
+        if (rst==1'b1) begin
             clk_div_cnt <= 0;
         end else begin
             if (clk_div_cnt == 0)
@@ -78,8 +78,8 @@ module uart_receiver_module #(
     end
 
     // FSM: sample at OVERSAMPLE ticks.
-    always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
+    always @(posedge clk or posedge rst) begin
+        if (rst==1'b1) begin
             state <= IDLE;
             sample_cnt <= 0;
             bit_index <= 0;

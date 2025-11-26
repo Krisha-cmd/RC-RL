@@ -5,7 +5,7 @@ module tx #(
     parameter integer BAUD_RATE  = 115200
 )(
     input  wire clk,
-    input  wire rst_n,
+    input  wire rst,
 
     output reg  tx,               // UART TX line
     input  wire tx_start,         // 1-cycle pulse to send byte
@@ -40,8 +40,8 @@ module tx #(
     // ----------------------------------------------
     // UART transmitter logic
     // ----------------------------------------------
-    always @(posedge clk or posedge rst_n) begin
-        if (rst_n==1'b1) begin
+    always @(posedge clk or posedge rst) begin
+        if (rst==1'b1) begin
             tx        <= 1'b1;
             busy_reg  <= 1'b0;
             shift_reg <= 10'b1111111111;

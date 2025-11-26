@@ -26,7 +26,7 @@ module bram_controller_module #(
     parameter integer ADDR_WIDTH = $clog2((IMG_SIZE==1)?2:IMG_SIZE)
 )(
     input  wire                    clk,
-    input  wire                    rst_n,
+    input  wire                    rst,
     input  wire [PIXEL_WIDTH-1:0]  write_data,
     input  wire                    write_valid,
     input  wire [ADDR_WIDTH-1:0]   read_addr,
@@ -39,8 +39,8 @@ module bram_controller_module #(
     (* ram_style = "block" *) reg [PIXEL_WIDTH-1:0] mem [0:IMG_SIZE-1];
     reg [ADDR_WIDTH-1:0] write_ptr;
 
-    always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
+    always @(posedge clk or posedge rst) begin
+        if (rst==1'b1) begin
             write_ptr <= {ADDR_WIDTH{1'b0}};
             frame_done <= 1'b0;
             write_addr <= {ADDR_WIDTH{1'b0}};

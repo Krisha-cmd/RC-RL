@@ -112,9 +112,35 @@ class UartImageSender:
                     # timeout occurred
                     break
                 data.extend(chunk)
-            logger.debug("Fallback: collected %d bytes (expected %d)", len(data), expected_len)
+            image_bytes = bytes(data[:expected_len])
+
+            # After image bytes, attempt to read logger block delimited by sentinel markers
+            sentinel = SENTINEL_DEFAULT
+            # read until first sentinel appears (may be sent immediately)
+            buf = bytearray()
+            found_first = False
+            end_time = time.time() + read_timeout
+            while time.time() < end_time:
+                b = self.ser.read(1)
+                if not b:
+                    break
+                buf.extend(b)
+                if not found_first and buf.endswith(sentinel):
+                    # start collecting logger bytes after first sentinel
+                    found_first = True
+                    buf = bytearray()  # reset to collect logger payload
+                    continue
+                if found_first and buf.endswith(sentinel):
+                    # trailing sentinel found; remove sentinel and finish
+                    buf = buf[:-len(sentinel)]
+                    logger.debug("Collected %d logger bytes", len(buf))
+                    logger.info("Transfer (image+logger) complete in %.3fs", time.time() - start_time)
+                    return (image_bytes, bytes(buf))
+
+            # If sentinel sequence not found, return image and empty logger
+            logger.debug("Fallback: collected %d bytes (expected %d) but no logger sentinel", len(data), expected_len)
             logger.info("Transfer (fallback) complete in %.3fs", time.time() - start_time)
-            return bytes(data)
+            return (image_bytes, b"")
 
         # No expected length: read until timeout and return whatever arrived
         while True:
@@ -217,18 +243,48 @@ def process_folder(args):
                 base = img_path.stem
                 out_img_name = f"{base}_{idx}{img_path.suffix}" if img_path.suffix else f"{base}_{idx}.bin"
                 out_img_path = out_img_dir / out_img_name
-                reconstruct_output_image(resp, out_img_path, args.out_width, args.out_height, img_path.suffix)
-                csv_path = out_csv_dir / f"{base}.csv"
+                logger_entries = []
+                # resp may be (image_bytes, logger_bytes) or plain bytes
+                if isinstance(resp, tuple):
+                    image_bytes, logger_bytes = resp
+                    reconstruct_output_image(image_bytes, out_img_path, args.out_width, args.out_height, img_path.suffix)
+                    # parse logger_bytes as 16-bit words (MSB then LSB)
+                    for i in range(0, len(logger_bytes) - 1, 2):
+                        val = (logger_bytes[i] << 8) | logger_bytes[i+1]
+                        logger_entries.append(val)
+                    bytes_received = len(image_bytes) + len(logger_bytes)
+
+                    # Decode logger_entries into fields and write per-image logger CSV
+                    # Always create per-image logger CSV with header (even if no entries)
+                    logger_csv_path = out_csv_dir / f"{base}.csv"
+                    with logger_csv_path.open('w', newline='') as lf:
+                        w = csv.writer(lf)
+                        w.writerow(['entry','fifo1_load_bucket','fifo2_load_bucket','resizer_state','gray_state','divider_resizer','divider_grayscale'])
+                        for ridx, val in enumerate(logger_entries, start=1):
+                            fifo1 = (val >> 13) & 0x7
+                            fifo2 = (val >> 10) & 0x7
+                            resizer_s = (val >> 9) & 0x1
+                            gray_s = (val >> 8) & 0x1
+                            div_res = (val >> 4) & 0xF
+                            div_gray = val & 0xF
+                            w.writerow([ridx, fifo1, fifo2, resizer_s, gray_s, div_res, div_gray])
+                else:
+                    image_bytes = resp
+                    reconstruct_output_image(image_bytes, out_img_path, args.out_width, args.out_height, img_path.suffix)
+                    bytes_received = len(image_bytes)
+
+                csv_path = out_csv_dir / f"{base}_summary.csv"
                 write_csv(csv_path, {
                     'id': idx,
                     'input_name': img_path.name,
                     'bytes_sent': len(payload),
-                    'bytes_received': len(resp),
+                    'bytes_received': bytes_received,
                     'duration_s': round(time.time() - t0, 6),
                     'output_image_path': str(out_img_path),
                     'mode': args.mode,
                     'success': True,
-                    'timestamp': time.strftime('%Y-%m-%dT%H:%M:%S')
+                    'timestamp': time.strftime('%Y-%m-%dT%H:%M:%S'),
+                    'logger_entries': ";".join(str(x) for x in logger_entries)
                 })
                 success_count += 1
                 logger.info("Processed %s -> %s", img_path.name, out_img_name)
@@ -249,7 +305,7 @@ def process_folder(args):
                 except Exception:
                     bytes_received = 0
 
-                csv_path = out_csv_dir / f"{img_path.stem}.csv"
+                csv_path = out_csv_dir / f"{img_path.stem}_summary.csv"
                 write_csv(csv_path, {
                     'id': idx,
                     'input_name': img_path.name,

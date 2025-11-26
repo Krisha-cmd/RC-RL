@@ -1,5 +1,1 @@
-id,input_name,bytes_sent,bytes_received,duration_s,output_image_path,mode,success,timestamp
-2,sample.jpeg,0,0,4.357608,,length,False,2025-11-25T16:38:08
-2,sample.jpeg,0,0,4.340093,,length,False,2025-11-25T16:38:24
-2,sample.jpeg,0,6140,4.338305,,length,False,2025-11-25T16:39:25
-2,sample.jpeg,49152,4096,4.34731,output\sample_2.jpeg,length,True,2025-11-25T16:41:34
+entry,fifo1_load_bucket,fifo2_load_bucket,resizer_state,gray_state,divider_resizer,divider_grayscale

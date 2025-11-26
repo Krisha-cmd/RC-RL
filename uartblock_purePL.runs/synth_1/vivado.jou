@@ -3,11 +3,11 @@
 # SW Build 6140274 on Thu May 22 00:12:29 MDT 2025
 # IP Build 6138677 on Thu May 22 03:10:11 MDT 2025
 # SharedData Build 6139179 on Tue May 20 17:58:58 MDT 2025
-# Start of session at: Tue Nov 25 14:39:54 2025
-# Process ID         : 19300
+# Start of session at: Wed Nov 26 13:02:04 2025
+# Process ID         : 16312
 # Current directory  : C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.runs/synth_1
-# Command line       : vivado.exe -log top_processing.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source top_processing.tcl
-# Log file           : C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.runs/synth_1/top_processing.vds
+# Command line       : vivado.exe -log top_simple.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source top_simple.tcl
+# Log file           : C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.runs/synth_1/top_simple.vds
 # Journal file       : C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.runs/synth_1\vivado.jou
 # Running On         : BOOK-JBCPDRK7D5
 # Platform           : Windows Server 2016 or Windows 10
@@ -19,6 +19,6 @@
 # Host memory        : 16854 MB
 # Swap memory        : 45149 MB
 # Total Virtual      : 62004 MB
-# Available Virtual  : 33054 MB
+# Available Virtual  : 27724 MB
 #-----------------------------------------------------------
-source top_processing.tcl -notrace
+source top_simple.tcl -notrace

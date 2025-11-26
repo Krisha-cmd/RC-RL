@@ -7,7 +7,7 @@ module rl_agent #(
     parameter integer INTERVAL = 20  // trigger every N cycles
 )(
     input  wire clk,
-    input  wire rst_n,
+    input  wire rst,
 
     // output command (pulse of 1 cycle)
     output reg        rl_valid,
@@ -22,8 +22,8 @@ module rl_agent #(
     localparam S_SEND1 = 2'd1;
     localparam S_SEND2 = 2'd2;
 
-    always @(posedge clk or posedge rst_n) begin
-        if (rst_n==1'b1) begin
+    always @(posedge clk or posedge rst) begin
+        if (rst==1'b1) begin
             cycle_counter <= 32'd0;
             rl_valid <= 1'b0;
             core_mask <= 2'b00;

@@ -3,7 +3,7 @@ module rx #(
     parameter integer BAUD_RATE  = 115200
 )(
     input  wire clk,
-    input  wire rst_n,
+    input  wire rst,
     input  wire rx,
 
     output reg [7:0] rx_byte      = 8'd0,
@@ -34,7 +34,7 @@ module rx #(
     reg [7:0]  shift_reg = 0;
 
     always @(posedge clk) begin
-        if (rst_n==1'b1) begin
+        if (rst==1'b1) begin
             state          <= IDLE;
             rx_byte_valid  <= 1'b0;
             baud_cnt       <= 0;

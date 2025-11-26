@@ -4,7 +4,7 @@ module pixel_assembler #(
     parameter integer CHANNELS = 3
 )(
     input  wire clk,
-    input  wire rst_n,
+    input  wire rst,
     // BRAM FIFO read interface (consumer side)
     input  wire bram_rd_valid,    // from bram_fifo
     output reg  bram_rd_ready,    // assert to pop a byte
@@ -17,8 +17,8 @@ module pixel_assembler #(
     reg [1:0] state;
     reg [7:0] b0, b1, b2;
 
-    always @(posedge clk or posedge rst_n) begin
-        if (rst_n==1'b1) begin
+    always @(posedge clk or posedge rst) begin
+        if (rst==1'b1) begin
             state <= 0;
             bram_rd_ready <= 0;
             pixel_out <= 0;

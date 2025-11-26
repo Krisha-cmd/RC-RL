@@ -34,7 +34,7 @@ module top_module #(
     // Internal signals and ties
     // -------------------------------------------------------------------------
     // Tie reset high (inactive) because removed from top-level ports.
-    wire rst_n = 1'b1;
+    wire rst = 1'b1;
 
     // Keep read_addr/read_pixel/frame_done_pulse internal for now.
     // read_addr tied to 0 (unused external read); read_pixel driven by BRAM.
@@ -55,7 +55,7 @@ module top_module #(
         .BAUD_RATE(BAUD_RATE)
     ) uart_rx_inst (
         .clk(clk),
-        .rst_n(rst_n),
+        .rst(rst),
         .rx(uart_rx),
         .rx_byte(rx_byte),
         .rx_byte_valid(rx_byte_valid)
@@ -71,7 +71,7 @@ module top_module #(
         .ADDR_WIDTH(ADDR_WIDTH)
     ) bram_ctrl_inst (
         .clk(clk),
-        .rst_n(rst_n),
+        .rst(rst),
         .write_data(rx_byte),
         .write_valid(rx_byte_valid),
         .read_addr(read_addr),         // internal (currently tied to zero)
@@ -85,7 +85,7 @@ module top_module #(
     // -------------------------------------------------------------------------
     pulse_stretcher #(.WIDTH(24)) stretcher_inst (
         .clk(clk),
-        .rst_n(rst_n),
+        .rst(rst),
         .pulse_in(frame_done_pulse),
         .stretched_out(frame_done_debug)
     );

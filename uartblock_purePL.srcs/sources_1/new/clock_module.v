@@ -2,7 +2,7 @@
 
 module clock_module (
     input  wire        clk,
-    input  wire        rst_n,
+    input  wire        rst,
 
     input  wire        rl_valid,
     input  wire [1:0]  core_mask,
@@ -19,8 +19,8 @@ module clock_module (
     reg [7:0] cnt_resizer = 0;
     reg [7:0] cnt_gray    = 0;
 
-    always @(posedge clk or posedge rst_n) begin
-        if (rst_n==1'b1) begin
+    always @(posedge clk or posedge rst) begin
+        if (rst==1'b1) begin
             divider_resizer <= 8'd1;
             divider_gray    <= 8'd1;
             cnt_resizer <= 0;

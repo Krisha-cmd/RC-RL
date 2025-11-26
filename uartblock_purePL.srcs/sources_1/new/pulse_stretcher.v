@@ -24,15 +24,15 @@ module pulse_stretcher #(
   parameter integer WIDTH = 24  // at 100 MHz, 2^24 / 100e6 ? 0.167s (if preloaded to all-ones)
 ) (
   input  wire clk,
-  input  wire rst_n,
+  input  wire rst,
   input  wire pulse_in,
   output reg  stretched_out
 );
 
   reg [WIDTH-1:0] cnt;
 
-  always @(posedge clk or negedge rst_n) begin
-    if (!rst_n) begin
+  always @(posedge clk or posedge rst) begin
+    if (rst==1'b1) begin
       cnt <= {WIDTH{1'b0}};
       stretched_out <= 1'b0;
     end else begin

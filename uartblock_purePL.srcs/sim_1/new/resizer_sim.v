@@ -11,7 +11,7 @@ module resizer_sim;
     localparam PIXEL_BITS = PIXEL_WIDTH * CHANNELS;
 
     reg clk;
-    reg rst_n;
+    reg rst;
 
     reg  [PIXEL_BITS-1:0] data_in;
     reg                   read_signal;
@@ -29,7 +29,7 @@ module resizer_sim;
         .CHANNELS(CHANNELS)
     ) dut (
         .clk(clk),
-        .rst_n(rst_n),
+        .rst(rst),
         .data_in(data_in),
         .read_signal(read_signal),
         .data_out(data_out),
@@ -44,11 +44,11 @@ module resizer_sim;
     end
 
     initial begin
-        rst_n = 0;
+        rst = 0;
         read_signal = 0;
         data_in = 0;
         #50;
-        rst_n = 1;
+        rst = 1;
     end
 
 
@@ -56,7 +56,7 @@ module resizer_sim;
     reg [7:0] r, g, b;
 
     initial begin
-        @(posedge rst_n); 
+        @(posedge rst); 
         #20;
 
         $display("============================================");

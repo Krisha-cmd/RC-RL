@@ -17,7 +17,7 @@ module top_module_128 #(
     //----------------------------------------------------------
     // Reset
     //----------------------------------------------------------
-    wire rst_n = 1'b1;
+    wire rst = 1'b1;
 
     //----------------------------------------------------------
     // Address pointers
@@ -50,7 +50,7 @@ module top_module_128 #(
         .BAUD_RATE(BAUD_RATE)
     ) rx1 (
         .clk(clk),
-        .rst_n(rst_n),
+        .rst(rst),
         .rx(uart_rx),
         .rx_byte(rx_byte),
         .rx_byte_valid(rx_byte_valid)
@@ -66,7 +66,7 @@ module top_module_128 #(
         .ADDR_WIDTH(ADDR_WIDTH)
     ) bram_11 (
         .clk(clk),
-        .rst_n(rst_n),
+        .rst(rst),
 
         // write port
         .write_data(rx_byte),
@@ -86,7 +86,7 @@ module top_module_128 #(
         .BAUD_RATE(BAUD_RATE)
     ) tx1 (
         .clk(clk),
-        .rst_n(rst_n),
+        .rst(rst),
         .tx(uart_tx),
         .tx_start(tx_start),
         .tx_data(tx_data)
@@ -96,7 +96,7 @@ module top_module_128 #(
     // WRITE POINTER LOGIC (BRAM Write)
     //----------------------------------------------------------
     always @(posedge clk) begin
-        if (!rst_n)
+        if (rst==1'b1)
             write_addr <= 0;
         else if (rx_byte_valid)
             write_addr <= write_addr + 1;
@@ -108,7 +108,7 @@ module top_module_128 #(
     reg rx_valid_dly = 0;
 
     always @(posedge clk) begin
-        if (!rst_n) begin
+        if (rst==1'b1) begin
             read_addr   <= 0;
             rx_valid_dly <= 0;
             tx_start    <= 0;
