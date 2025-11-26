@@ -78,6 +78,10 @@ module rl_q_learning_agent #(
     reg [ACTION_BITS-1:0] prev_action;
     reg signed [Q_VALUE_WIDTH-1:0] prev_q_value;
     
+    // TD learning variables (must be declared at module level for Verilog-2001)
+    reg signed [Q_VALUE_WIDTH-1:0] td_error;
+    reg signed [Q_VALUE_WIDTH-1:0] update_delta;
+    
     // Reward calculation
     reg signed [Q_VALUE_WIDTH-1:0] reward;
     
@@ -94,11 +98,11 @@ module rl_q_learning_agent #(
     
     integer i;
     
-    // Initialize Q-table
+    // Initialize Q-table with safe defaults
     initial begin
         for (i = 0; i < Q_TABLE_SIZE; i = i + 1) begin
             q_table[i] = 0;
-            action_table[i] = 16'h5555;  // Default: all cores at divider=5 (medium speed)
+            action_table[i] = 16'h0000;  // Default: all cores at divider=0 (FULL SPEED - safest)
         end
     end
     
@@ -114,18 +118,22 @@ module rl_q_learning_agent #(
             avg_reward <= 0;
             reward_accumulator <= 0;
             prev_state <= 0;
-            prev_action <= 16'h5555;
+            prev_action <= 16'h0000;
             prev_q_value <= 0;
-            rl_core0_div <= 4'd5;
-            rl_core1_div <= 4'd5;
-            rl_core2_div <= 4'd5;
-            rl_core3_div <= 4'd5;
+            rl_core0_div <= 4'd0;  // FULL SPEED on reset (safest)
+            rl_core1_div <= 4'd0;
+            rl_core2_div <= 4'd0;
+            rl_core3_div <= 4'd0;
             current_state_out <= 0;
             current_action_out <= 0;
         end else if (!enable) begin
-            // When disabled, use safe default values
+            // When disabled, force FULL SPEED for safety
             rl_update_valid <= 0;
             rl_state <= STATE_IDLE;
+            rl_core0_div <= 4'd0;  // Full speed
+            rl_core1_div <= 4'd0;
+            rl_core2_div <= 4'd0;
+            rl_core3_div <= 4'd0;
         end else begin
             // Update random number generator
             rand_lfsr <= rand_next;
@@ -174,9 +182,6 @@ module rl_q_learning_agent #(
                     
                     if (total_updates > 0) begin
                         // TD error = reward - prev_q_value
-                        reg signed [Q_VALUE_WIDTH-1:0] td_error;
-                        reg signed [Q_VALUE_WIDTH-1:0] update_delta;
-                        
                         td_error = reward - prev_q_value;
                         // update_delta = (LEARNING_RATE * td_error) / 256
                         update_delta = (td_error * LEARNING_RATE) >>> 8;
@@ -199,16 +204,16 @@ module rl_q_learning_agent #(
                 STATE_SELECT: begin
                     // Epsilon-greedy action selection
                     if (rand_lfsr < EPSILON) begin
-                        // Explore: random action
+                        // Explore: random action with SAFE dividers (0-2 only!)
                         explore_flag <= 1;
                         exploration_count <= exploration_count + 1;
                         
-                        // Generate random dividers (1-15)
+                        // Generate SAFE random dividers (0-2 only, never slow cores too much)
                         selected_action <= {
-                            rand_lfsr[3:0] | 4'b0001,           // core0: 1-15
-                            rand_next[3:0] | 4'b0001,           // core1: 1-15
-                            {rand_lfsr[7:4]} | 4'b0001,         // core2: 1-15
-                            {rand_next[7:4]} | 4'b0001          // core3: 1-15
+                            rand_lfsr[1:0],                     // core0: 0-3 (limit to safe values)
+                            rand_next[1:0],                     // core1: 0-3
+                            rand_lfsr[3:2],                     // core2: 0-3
+                            rand_next[3:2]                      // core3: 0-3
                         };
                     end else begin
                         // Exploit: use best known action from Q-table
@@ -222,11 +227,26 @@ module rl_q_learning_agent #(
                 end
                 
                 STATE_EXECUTE: begin
-                    // Apply selected action (update clock dividers)
-                    rl_core0_div <= selected_action[15:12];
-                    rl_core1_div <= selected_action[11:8];
-                    rl_core2_div <= selected_action[7:4];
-                    rl_core3_div <= selected_action[3:0];
+                    // SAFETY CHECK: If any FIFO is filling up (high bits set), force full speed
+                    if (fifo1_load[2] || fifo2_load[2] || fifo3_load[2]) begin
+                        // FIFO more than 50% full - EMERGENCY: run at full speed
+                        rl_core0_div <= 4'd0;
+                        rl_core1_div <= 4'd0;
+                        rl_core2_div <= 4'd0;
+                        rl_core3_div <= 4'd0;
+                    end else if (core_stall) begin
+                        // System is stalling - run at full speed
+                        rl_core0_div <= 4'd0;
+                        rl_core1_div <= 4'd0;
+                        rl_core2_div <= 4'd0;
+                        rl_core3_div <= 4'd0;
+                    end else begin
+                        // Safe to apply RL action, but limit to safe values (max divider = 3)
+                        rl_core0_div <= (selected_action[15:12] > 4'd3) ? 4'd3 : selected_action[15:12];
+                        rl_core1_div <= (selected_action[11:8] > 4'd3) ? 4'd3 : selected_action[11:8];
+                        rl_core2_div <= (selected_action[7:4] > 4'd3) ? 4'd3 : selected_action[7:4];
+                        rl_core3_div <= (selected_action[3:0] > 4'd3) ? 4'd3 : selected_action[3:0];
+                    end
                     rl_update_valid <= 1;
                     
                     rl_state <= STATE_IDLE;

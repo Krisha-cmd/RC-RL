@@ -31,3 +31,6 @@ set_property PACKAGE_PIN U21 [get_ports led_blur_busy]
 set_property PACKAGE_PIN W22 [get_ports led_diffamp_busy]
 set_property IOSTANDARD LVCMOS33 [get_ports led_blur_busy]
 set_property IOSTANDARD LVCMOS33 [get_ports led_diffamp_busy]
+
+set_property PACKAGE_PIN F22 [get_ports rl_enable]
+set_property IOSTANDARD LVCMOS33 [get_ports rl_enable]

@@ -84,6 +84,7 @@ read_verilog -library xil_defaultlib {
   C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/pixel_assembler.v
   C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/pixel_splitter.v
   C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/resizer_core.v
+  C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/rl_q_learning_agent.v
   C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/rx.v
   C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/tx.v
   C:/Users/iamri/Documents/Subham_UART/uartblock_purePL/uartblock_purePL.srcs/sources_1/new/top_pipeline_with_grayscale.v

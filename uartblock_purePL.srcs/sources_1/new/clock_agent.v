@@ -102,6 +102,52 @@ module clock_agent #(
             // RL Agent Integration
             if (rl_enable && rl_update_valid) begin
                 // Apply RL agent decisions
+                core_dividers[0] <= rl_core0_div;
+                core_dividers[1] <= rl_core1_div;
+                core_dividers[2] <= rl_core2_div;
+                core_dividers[3] <= rl_core3_div;
+                total_decisions <= total_decisions + 1;
+                
+                // Reset div counters when changing dividers
+                for (i = 0; i < NUM_CORES; i = i + 1) begin
+                    div_counters[i] <= 0;
+                end
+            end
+            
+            // Performance feedback calculation
+            // Stall if FIFOs are getting full (bottleneck detected)
+            core_stall <= (fifo1_load >= 7) || (fifo2_load >= 7) || (fifo3_load >= 7);
+            
+            // Throughput good if FIFOs are flowing (not empty, not full)
+            throughput_good <= (fifo1_load >= 2 && fifo1_load <= 5) &&
+                               (fifo2_load >= 2 && fifo2_load <= 5) &&
+                               (fifo3_load >= 2 && fifo3_load <= 5);
+            
+            // Generate clock enables based on current dividers
+            for (i = 0; i < NUM_CORES; i = i + 1) begin
+                if (!rl_enable) begin
+                    // When RL disabled: force full speed for safety
+                    core_clk_en[i] <= 1'b1;
+                    core_dividers[i] <= 0;
+                end else if (core_stall || (fifo1_load >= 6) || (fifo2_load >= 6) || (fifo3_load >= 6)) begin
+                    // SAFETY: If any FIFO is getting too full, force full speed
+                    core_clk_en[i] <= 1'b1;
+                    core_dividers[i] <= 0;
+                end else if (core_dividers[i] == 0) begin
+                    // No division - always enabled
+                    core_clk_en[i] <= 1'b1;
+                end else begin
+                    // Clock divider logic
+                    if (div_counters[i] >= core_dividers[i]) begin
+                        div_counters[i] <= 0;
+                        core_clk_en[i] <= 1'b1;
+                    end else begin
+                        div_counters[i] <= div_counters[i] + 1;
+                        core_clk_en[i] <= 1'b0;
+                        clock_cycles_saved <= clock_cycles_saved + 1;
+                    end
+                end
+            end
             
             // Track activity for statistics
             for (i = 0; i < NUM_CORES; i = i + 1) begin
@@ -110,49 +156,7 @@ module clock_agent #(
                 end else begin
                     core_idle_cycles[i] <= core_idle_cycles[i] + 1;
                 end
-            end          new_dividers[CORE_DIFFAMP] <= 0;  // Full speed
-                    end else begin
-                        new_dividers[CORE_DIFFAMP] <= 1;  // Half speed (safe)
-                    end
-                    
-                    // Blur: Can be slowest as it's at the end
-                    if (fifo3_load >= 7) begin
-                        new_dividers[CORE_BLUR] <= 0;  // Full speed to drain FIFO
-                    end else if (fifo3_load <= 3) begin
-                        new_dividers[CORE_BLUR] <= 3;  // Quarter speed
-                    end else begin
-                        new_dividers[CORE_BLUR] <= 1;  // Half speed
-                    end
-                    
-                    state <= STATE_RL_UPDATE;
-                end
-                
-                STATE_RL_UPDATE: begin
-                    // PLACEHOLDER: RL agent will override decisions here
-                    // For now, just pass through the heuristic decisions
-                    // Future: RL agent reads state, computes Q-values, selects actions
-                    state <= STATE_APPLY;
-                end
-                
-                STATE_APPLY: begin
-                    // Apply new divider settings
-                    for (i = 0; i < NUM_CORES; i = i + 1) begin
-                        core_dividers[i] <= new_dividers[i];
-                        div_counters[i] <= 0;  // Reset counters when changing dividers
-                    end
-                    
-                    // Reset activity tracking for next interval
-                    for (i = 0; i < NUM_CORES; i = i + 1) begin
-                        core_active_cycles[i] <= 0;
-                        core_idle_cycles[i] <= 0;
-                    end
-                    
-                    total_decisions <= total_decisions + 1;
-                    state <= STATE_MONITOR;
-                
-                default: state <= STATE_MONITOR;
-            endcase
-            */
+            end
         end
     end
 endmodule
