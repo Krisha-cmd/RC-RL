@@ -15,13 +15,13 @@ module rx #(
     reg rx_sync1 = 1;
     reg rx_sync2 = 1;
 
-    // Synchronize RX input
+    
     always @(posedge clk) begin
         rx_sync1 <= rx;
         rx_sync2 <= rx_sync1;
     end
 
-    // State machine
+    
     localparam IDLE      = 0,
                START_BIT = 1,
                DATA_BITS = 2,
@@ -41,23 +41,23 @@ module rx #(
             bit_idx        <= 0;
             shift_reg      <= 0;
         end else begin
-            rx_byte_valid <= 1'b0; // default
+            rx_byte_valid <= 1'b0; 
 
             case (state)
 
-            //--------------------------------------------------
-            // IDLE - wait for RX line to go low (start bit)
-            //--------------------------------------------------
+            
+            
+            
             IDLE: begin
                 if (rx_sync2 == 1'b0) begin
                     state     <= START_BIT;
-                    baud_cnt  <= BAUD_DIV/2;  // sample mid-bit
+                    baud_cnt  <= BAUD_DIV/2;  
                 end
             end
 
-            //--------------------------------------------------
-            // START BIT - check if still low
-            //--------------------------------------------------
+            
+            
+            
             START_BIT: begin
                 if (baud_cnt == 0) begin
                     if (rx_sync2 == 1'b0) begin
@@ -71,9 +71,9 @@ module rx #(
                     baud_cnt <= baud_cnt - 1;
             end
 
-            //--------------------------------------------------
-            // DATA BITS (8 bits)
-            //--------------------------------------------------
+            
+            
+            
             DATA_BITS: begin
                 if (baud_cnt == 0) begin
                     shift_reg[bit_idx] <= rx_sync2;
@@ -88,14 +88,14 @@ module rx #(
                     baud_cnt <= baud_cnt - 1;
             end
 
-            //--------------------------------------------------
-            // STOP BIT
-            //--------------------------------------------------
+            
+            
+            
             STOP_BIT: begin
                 if (baud_cnt == 0) begin
                     if (rx_sync2 == 1'b1) begin
                         rx_byte       <= shift_reg;
-                        rx_byte_valid <= 1'b1;  // 1 cycle pulse
+                        rx_byte_valid <= 1'b1;  
                     end
                     state <= IDLE;
                 end else

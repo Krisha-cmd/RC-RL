@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
-// clock_module_simple.v
-// Generates CE pulses for cores and holds simple divider registers; accepts rl_agent commands
+
+
 
 module clock_module_simple (
     input  wire clk,
@@ -18,7 +18,7 @@ module clock_module_simple (
     function [7:0] map_code_to_div;
         input [7:0] code;
         begin
-            map_code_to_div = (code % 250) + 1; // 1..250
+            map_code_to_div = (code % 250) + 1; 
         end
     endfunction
 

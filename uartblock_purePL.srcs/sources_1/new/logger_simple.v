@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
-// logger_simple.v
-// Small synchronous logger that collects periodic 16-bit entries and supports synchronous reads
+
+
 
 module logger_simple #(
     parameter integer INTERVAL_CYCLES = 20,

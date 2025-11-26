@@ -28,9 +28,9 @@ module boxblur_core #(
     reg [W_BITS-1:0] y;
 
     integer i;
-    integer sum;   // moved here (legal)
+    integer sum;   
 
-    // Clear line buffers
+    
     initial begin
         for (i = 0; i < IMG_WIDTH; i = i + 1)
             line1[i] = 0;
@@ -51,36 +51,36 @@ module boxblur_core #(
             inc_endptr2 <= 0;
 
         end else begin
-            // default outputs
+            
             valid       <= 0;
             write       <= 0;
             inc_endptr2 <= 0;
 
             if (read) begin
 
-                // ---------------------------------------------------
-                // Line Buffers (previous row shift)
-                // ---------------------------------------------------
+                
+                
+                
                 line2[x] <= line1[x];
                 line1[x] <= data;
 
-                // ---------------------------------------------------
-                // Shift 3x3 window left
-                // ---------------------------------------------------
+                
+                
+                
                 w00 <= w01;  w01 <= w02;
                 w10 <= w11;  w11 <= w12;
                 w20 <= w21;  w21 <= w22;
 
-                // ---------------------------------------------------
-                // Insert new rightmost column
-                // ---------------------------------------------------
+                
+                
+                
                 w02 <= line2[x];
                 w12 <= line1[x];
                 w22 <= data;
 
-                // ---------------------------------------------------
-                // Compute blur (only valid after first two rows)
-                // ---------------------------------------------------
+                
+                
+                
                 if ((x > 1) && (y > 1)) begin
                     sum =
                         w00 + w01 + w02 +
@@ -96,9 +96,9 @@ module boxblur_core #(
                 write       <= 1;
                 inc_endptr2 <= 1;
 
-                // ---------------------------------------------------
-                // Update coordinates
-                // ---------------------------------------------------
+                
+                
+                
                 if (x == IMG_WIDTH-1) begin
                     x <= 0;
                     if (y == IMG_HEIGHT-1)

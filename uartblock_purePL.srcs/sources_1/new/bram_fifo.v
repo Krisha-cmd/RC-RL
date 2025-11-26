@@ -1,33 +1,33 @@
 `timescale 1ns / 1ps
 module bram_fifo #(
-    parameter integer DEPTH = 4096,     // must be power-of-two
+    parameter integer DEPTH = 4096,     
     parameter integer ADDR_WIDTH = $clog2(DEPTH)
 )(
-    // Write port (producer domain)
+    
     input  wire                 wr_clk,
     input  wire                 wr_rst,
     input  wire                 wr_valid,
     output reg                  wr_ready,
     input  wire [7:0]           wr_data,
 
-    // Read port (consumer domain)
+    
     input  wire                 rd_clk,
     input  wire                 rd_rst,
     output reg                  rd_valid,
     input  wire                 rd_ready,
     output reg  [7:0]           rd_data,
 
-    // status
+    
     output wire [ADDR_WIDTH:0]  wr_count_sync,
     output wire [ADDR_WIDTH:0]  rd_count_sync,
 
-    // NEW: FIFO load indicator (0-7)
+    
     output reg  [2:0]           load_bucket
 );
 
-    // ----------------------------------------------
-    // INTERNAL POINTERS & SYNC
-    // ----------------------------------------------
+    
+    
+    
 
     reg [ADDR_WIDTH:0] wr_ptr_bin, rd_ptr_bin;
     reg [ADDR_WIDTH:0] wr_ptr_bin_next;
@@ -36,7 +36,7 @@ module bram_fifo #(
     reg [ADDR_WIDTH:0] wr_ptr_gray_sync1, wr_ptr_gray_sync2;
     reg [ADDR_WIDTH:0] rd_ptr_gray_sync1, rd_ptr_gray_sync2;
 
-    // binary <-> gray conversion
+    
     function [ADDR_WIDTH:0] bin2gray(input [ADDR_WIDTH:0] b);
         bin2gray = (b >> 1) ^ b;
     endfunction
@@ -55,9 +55,9 @@ module bram_fifo #(
     wire [ADDR_WIDTH:0] rd_ptr_bin_synced = gray2bin(rd_ptr_gray_sync2);
     wire [ADDR_WIDTH:0] wr_ptr_bin_synced = gray2bin(wr_ptr_gray_sync2);
 
-    // ----------------------------------------------
-    // BRAM
-    // ----------------------------------------------
+    
+    
+    
 
     wire [7:0] bram_rd_dout;
     reg  bram_wr_en_reg;
@@ -69,26 +69,26 @@ module bram_fifo #(
         .DEPTH(DEPTH),
         .ADDR_WIDTH(ADDR_WIDTH)
     ) bram_inst (
-        // WRITE PORT (A)
+        
         .clk_a                (wr_clk),
-        .porta_write_address  (bram_wr_addr),     // <-- corrected
-        .porta_write_enabled  (bram_wr_en_reg),   // <-- corrected
-        .porta_enabled        (bram_wr_en_reg),   // enable when writing
+        .porta_write_address  (bram_wr_addr),     
+        .porta_write_enabled  (bram_wr_en_reg),   
+        .porta_enabled        (bram_wr_en_reg),   
         .porta_data_in        (bram_wr_din),
     
-        // READ PORT (B)
+        
         .clk_b                (rd_clk),
-        .portb_read_address   (bram_rd_addr),     // <-- corrected
-        .portb_enabled        (1'b1),             // always enabled for FIFO
+        .portb_read_address   (bram_rd_addr),     
+        .portb_enabled        (1'b1),             
         .portb_data_out       (bram_rd_dout)
     );
     
 
-    // ----------------------------------------------
-    // WRITE SIDE
-    // ----------------------------------------------
+    
+    
+    
 
-    // Sync read pointer into write domain
+    
     always @(posedge wr_clk or posedge wr_rst) begin
         if (wr_rst==1'b1) begin
             rd_ptr_gray_sync1 <= 0;
@@ -99,12 +99,12 @@ module bram_fifo #(
         end
     end
 
-    // Compute FULL
+    
     wire [ADDR_WIDTH:0] rd_ptr_bin_wr = rd_ptr_bin_synced;
     wire full_flag =
         ((wr_ptr_bin_next - rd_ptr_bin_wr) == {1'b1, {ADDR_WIDTH{1'b0}}});
 
-    // Write logic
+    
     always @(*) begin
         wr_ready = ~full_flag;
         bram_wr_din = wr_data;
@@ -127,9 +127,9 @@ module bram_fifo #(
         end
     end
 
-    // ----------------------------------------------
-    // READ SIDE
-    // ----------------------------------------------
+    
+    
+    
 
     always @(posedge rd_clk or posedge rd_rst) begin
         if (rd_rst==1'b1) begin
@@ -158,9 +158,9 @@ module bram_fifo #(
         end
     end
 
-    // ----------------------------------------------
-    // LOAD BUCKET CALCULATION (3 bits)
-    // ----------------------------------------------
+    
+    
+    
 
     assign wr_count_sync = wr_ptr_bin - rd_ptr_bin_synced;
     assign rd_count_sync = wr_ptr_bin_synced - rd_ptr_bin;
@@ -169,7 +169,7 @@ module bram_fifo #(
         if (wr_rst==1'b1) begin
             load_bucket <= 3'd0;
         end else begin
-            // bucket = top 3 bits of count
+            
             load_bucket <= wr_count_sync[ADDR_WIDTH : ADDR_WIDTH-2];
         end
     end

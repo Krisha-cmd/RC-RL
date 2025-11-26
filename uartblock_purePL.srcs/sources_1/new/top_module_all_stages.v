@@ -1,9 +1,9 @@
 `timescale 1ns / 1ps
-// top_pipeline_with_grayscale.v
-// Pipeline: RX -> FIFO1 -> assembler1 -> resizer -> splitter -> FIFO2 -> assembler2 -> grayscale -> diff_amp -> blur -> FIFO3 -> TX
-// Complete pipeline with resizer (128x128 RGB -> 64x64 RGB), grayscale (64x64 RGB -> 64x64 Gray),
-// difference amplifier (contrast enhancement), and 1D box blur (smoothing)
-// Single clock domain, no RL throttling for reliable throughput.
+
+
+
+
+
 
 module top_module_all_stages #(
     parameter integer PIXEL_WIDTH = 8,
@@ -44,7 +44,7 @@ module top_module_all_stages #(
     localparam ADDR_W_FIFO2 = clog2(FIFO2_DEPTH);
     localparam ADDR_W_FIFO3 = clog2(FIFO3_DEPTH);
 
-    // UART
+    
     wire [7:0] rx_byte;
     wire rx_byte_valid;
     
@@ -72,7 +72,7 @@ module top_module_all_stages #(
         .tx_busy(tx_busy)
     );
 
-    // LEDs
+    
     localparam integer LED_PULSE_CYCLES = 500000;
     reg [22:0] rx_led_cnt;
     reg [22:0] tx_led_cnt;
@@ -118,7 +118,7 @@ module top_module_all_stages #(
     assign led_rx_activity = led_rx_r;
     assign led_tx_activity = led_tx_r;
 
-    // FIFO1 - stores incoming bytes from UART
+    
     wire fifo1_wr_ready;
     wire fifo1_rd_valid;
     wire [7:0] fifo1_rd_data;
@@ -144,7 +144,7 @@ module top_module_all_stages #(
         .load_bucket(fifo1_load_bucket)
     );
 
-    // Assembler1 - converts bytes to RGB pixels
+    
     wire [CHANNELS*PIXEL_WIDTH-1:0] pixel1;
     wire pixel1_valid;
     wire pixel1_ready;
@@ -165,7 +165,7 @@ module top_module_all_stages #(
     
     assign pixel1_ready = 1'b1;
 
-    // Resizer - 128x128 RGB -> 64x64 RGB (no clock gating)
+    
     wire [CHANNELS*PIXEL_WIDTH-1:0] res_out_pixel;
     wire res_valid;
     wire res_frame_done;
@@ -206,7 +206,7 @@ module top_module_all_stages #(
     
     assign led_resizer_busy = led_resizer_r;
 
-    // Splitter - converts RGB pixels to bytes
+    
     wire splitter_wr_valid;
     wire [7:0] splitter_wr_data;
     wire splitter_wr_ready;
@@ -225,7 +225,7 @@ module top_module_all_stages #(
         .bram_wr_data(splitter_wr_data)
     );
 
-    // FIFO2 - stores resized RGB bytes
+    
     wire fifo2_rd_valid;
     wire [7:0] fifo2_rd_data;
     wire fifo2_rd_ready;
@@ -253,7 +253,7 @@ module top_module_all_stages #(
     
     assign splitter_wr_ready = fifo2_wr_ready;
 
-    // Assembler2 - converts bytes back to RGB pixels for grayscale
+    
     wire [CHANNELS*PIXEL_WIDTH-1:0] pixel2;
     wire pixel2_valid;
     wire pixel2_ready;
@@ -274,7 +274,7 @@ module top_module_all_stages #(
     
     assign pixel2_ready = 1'b1;
 
-    // Grayscale core - RGB pixel to grayscale byte
+    
     wire gray_write;
     wire [7:0] gray_byte;
     wire gray_busy;
@@ -308,7 +308,7 @@ module top_module_all_stages #(
     
     assign led_gray_busy = led_gray_r;
 
-    // Difference Amplifier - contrast enhancement
+    
     wire diffamp_write;
     wire [7:0] diffamp_byte;
     wire diffamp_busy;
@@ -345,7 +345,7 @@ module top_module_all_stages #(
     
     assign led_diffamp_busy = led_diffamp_r;
 
-    // 1D Box Blur - smoothing filter
+    
     wire blur_write;
     wire [7:0] blur_byte;
     wire blur_busy;
@@ -357,7 +357,7 @@ module top_module_all_stages #(
     
     box_blur_1d #(
         .PIXEL_WIDTH(PIXEL_WIDTH),
-        .IMG_WIDTH(IN_WIDTH/2)  // 64x64 image after resizer
+        .IMG_WIDTH(IN_WIDTH/2)  
     ) blur_inst (
         .clk(clk),
         .rst(rst),
@@ -382,7 +382,7 @@ module top_module_all_stages #(
     
     assign led_blur_busy = led_blur_r;
 
-    // FIFO3 - stores final processed grayscale bytes
+    
     wire fifo3_rd_valid;
     wire [7:0] fifo3_rd_data;
     wire fifo3_rd_ready;
@@ -408,7 +408,7 @@ module top_module_all_stages #(
         .load_bucket(fifo3_load_bucket)
     );
 
-    // TX from FIFO3 - stream all grayscale bytes continuously
+    
     reg [7:0] tx_byte_latch;
     reg tx_byte_valid;
     reg tx_state;
@@ -425,7 +425,7 @@ module top_module_all_stages #(
             
             case (tx_state)
                 1'b0: begin
-                    // Wait for FIFO data available
+                    
                     if (fifo3_rd_valid) begin
                         tx_byte_latch <= fifo3_rd_data;
                         tx_byte_valid <= 1'b1;
@@ -433,7 +433,7 @@ module top_module_all_stages #(
                     end
                 end
                 1'b1: begin
-                    // Send byte when TX ready
+                    
                     if (!tx_busy && tx_byte_valid) begin
                         tx_data_reg <= tx_byte_latch;
                         tx_start_reg <= 1'b1;
@@ -445,7 +445,7 @@ module top_module_all_stages #(
         end
     end
     
-    // FIFO read ready: assert when in idle state and FIFO has data
+    
     assign fifo3_rd_ready = (tx_state == 1'b0) && fifo3_rd_valid;
 
 endmodule

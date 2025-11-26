@@ -1,9 +1,9 @@
 `timescale 1ns / 1ps
-// top_pipeline_with_grayscale.v
-// Pipeline: RX -> FIFO1 -> assembler1 -> resizer -> splitter -> FIFO2 -> assembler2 -> grayscale -> diff_amp -> blur -> FIFO3 -> TX
-// Complete pipeline with resizer (128x128 RGB -> 64x64 RGB), grayscale (64x64 RGB -> 64x64 Gray),
-// difference amplifier (contrast enhancement), and 1D box blur (smoothing)
-// Single clock domain, no RL throttling for reliable throughput.
+
+
+
+
+
 
 module top_pipeline_with_grayscale #(
     parameter integer PIXEL_WIDTH = 8,
@@ -17,7 +17,7 @@ module top_pipeline_with_grayscale #(
 )(
     input  wire clk,
     input  wire rst,
-    input  wire rl_enable,           // Enable/disable RL agent (1=enabled, 0=full speed)
+    input  wire rl_enable,           
     input  wire uart_rx,
     output wire uart_tx,
     output wire led_rx_activity,
@@ -45,9 +45,9 @@ module top_pipeline_with_grayscale #(
     localparam ADDR_W_FIFO2 = clog2(FIFO2_DEPTH);
     localparam ADDR_W_FIFO3 = clog2(FIFO3_DEPTH);
 
-    // RL Q-Learning Agent (controlled by rl_enable input)
-    // When enabled, learns optimal clock dividers based on FIFO loads
-    // When disabled (rl_enable=0), all cores run at full speed
+    
+    
+    
     
     wire [3:0] rl_core0_div, rl_core1_div, rl_core2_div, rl_core3_div;
     wire rl_update_valid;
@@ -59,11 +59,11 @@ module top_pipeline_with_grayscale #(
     
     rl_q_learning_agent #(
         .NUM_CORES(4),
-        .UPDATE_INTERVAL(1000)  // Update every 1000 cycles
+        .UPDATE_INTERVAL(1000)  
     ) rl_agent_inst (
         .clk(clk),
         .rst(rst),
-        .enable(rl_enable),  // Controlled by input pin
+        .enable(rl_enable),  
         .fifo1_load(fifo1_load_bucket),
         .fifo2_load(fifo2_load_bucket),
         .fifo3_load(fifo3_load_bucket),
@@ -86,8 +86,8 @@ module top_pipeline_with_grayscale #(
         .current_action_out(rl_current_action)
     );
     
-    // Clock Agent - Dynamic clock management for processing cores
-    wire [3:0] core_clk_en;  // [resizer, grayscale, diffamp, blur]
+    
+    wire [3:0] core_clk_en;  
     wire [3:0] core_busy_signals;
     wire [3:0] core0_divider, core1_divider, core2_divider, core3_divider;
     
@@ -98,7 +98,7 @@ module top_pipeline_with_grayscale #(
     ) clock_agent_inst (
         .clk(clk),
         .rst(rst),
-        .rl_enable(rl_enable),  // Pass through input pin
+        .rl_enable(rl_enable),  
         .rl_core0_div(rl_core0_div),
         .rl_core1_div(rl_core1_div),
         .rl_core2_div(rl_core2_div),
@@ -119,7 +119,7 @@ module top_pipeline_with_grayscale #(
         .clock_cycles_saved()
     );
 
-    // UART
+    
     wire [7:0] rx_byte;
     wire rx_byte_valid;
     
@@ -135,7 +135,7 @@ module top_pipeline_with_grayscale #(
     reg [7:0] tx_data_reg;
     wire tx_busy;
     
-    // Performance Logger
+    
     wire logger_logging_enabled;
     wire logger_transmit_logs;
     wire logger_tx_start;
@@ -157,7 +157,7 @@ module top_pipeline_with_grayscale #(
         .core1_divider(core1_divider),
         .core2_divider(core2_divider),
         .core3_divider(core3_divider),
-        .rl_enabled(rl_enable),              // Connect RL enable signal
+        .rl_enabled(rl_enable),              
         .logging_enabled(logger_logging_enabled),
         .transmit_logs(logger_transmit_logs),
         .tx_start(logger_tx_start),
@@ -166,25 +166,33 @@ module top_pipeline_with_grayscale #(
         .logs_transmitted(logger_logs_transmitted)
     );
     
-    // TX multiplexing: Switch to logger when image done
-    reg tx_mux_state;  // 0 = image mode, 1 = logger mode
+    
+    reg tx_mux_state;  
+    reg [7:0] mux_switch_delay;  
     
     always @(posedge clk) begin
         if (rst) begin
             tx_mux_state <= 1'b0;
+            mux_switch_delay <= 0;
         end else begin
-            // Switch to logger mode when image processing done
-            if (image_processing_done && !tx_mux_state) begin
-                tx_mux_state <= 1'b1;
+            
+            if (image_processing_done && !tx_mux_state && !tx_busy) begin
+                if (mux_switch_delay < 8'd100) begin
+                    mux_switch_delay <= mux_switch_delay + 1;
+                end else begin
+                    tx_mux_state <= 1'b1;
+                    mux_switch_delay <= 0;
+                end
             end
-            // Return to image mode when logger finishes
+            
             if (logger_logs_transmitted) begin
                 tx_mux_state <= 1'b0;
+                mux_switch_delay <= 0;
             end
         end
     end
     
-    // Multiplex TX signals
+    
     wire tx_start_mux = tx_mux_state ? logger_tx_start : tx_start_reg;
     wire [7:0] tx_data_mux = tx_mux_state ? logger_tx_data : tx_data_reg;
     assign logger_tx_busy = tx_busy;
@@ -201,7 +209,7 @@ module top_pipeline_with_grayscale #(
         .tx_busy(tx_busy)
     );
 
-    // LEDs
+    
     localparam integer LED_PULSE_CYCLES = 500000;
     reg [22:0] rx_led_cnt;
     reg [22:0] tx_led_cnt;
@@ -247,7 +255,7 @@ module top_pipeline_with_grayscale #(
     assign led_rx_activity = led_rx_r;
     assign led_tx_activity = led_tx_r;
 
-    // FIFO1 - stores incoming bytes from UART
+    
     wire fifo1_wr_ready;
     wire fifo1_rd_valid;
     wire [7:0] fifo1_rd_data;
@@ -273,7 +281,7 @@ module top_pipeline_with_grayscale #(
         .load_bucket(fifo1_load_bucket)
     );
 
-    // Assembler1 - converts bytes to RGB pixels
+    
     wire [CHANNELS*PIXEL_WIDTH-1:0] pixel1;
     wire pixel1_valid;
     wire pixel1_ready;
@@ -294,7 +302,7 @@ module top_pipeline_with_grayscale #(
     
     assign pixel1_ready = 1'b1;
 
-    // Resizer - 128x128 RGB -> 64x64 RGB (no clock gating)
+    
     wire [CHANNELS*PIXEL_WIDTH-1:0] res_out_pixel;
     wire res_valid;
     wire res_frame_done;
@@ -313,7 +321,7 @@ module top_pipeline_with_grayscale #(
     ) resizer_inst (
         .clk(clk),
         .rst(rst),
-        .clk_en(core_clk_en[0]),  // Clock enable from agent
+        .clk_en(core_clk_en[0]),  
         .data_in(pixel1),
         .read_signal(resizer_read),
         .data_out(res_out_pixel),
@@ -336,7 +344,7 @@ module top_pipeline_with_grayscale #(
     
     assign led_resizer_busy = led_resizer_r;
 
-    // Splitter - converts RGB pixels to bytes
+    
     wire splitter_wr_valid;
     wire [7:0] splitter_wr_data;
     wire splitter_wr_ready;
@@ -355,7 +363,7 @@ module top_pipeline_with_grayscale #(
         .bram_wr_data(splitter_wr_data)
     );
 
-    // FIFO2 - stores resized RGB bytes
+    
     wire fifo2_rd_valid;
     wire [7:0] fifo2_rd_data;
     wire fifo2_rd_ready;
@@ -383,7 +391,7 @@ module top_pipeline_with_grayscale #(
     
     assign splitter_wr_ready = fifo2_wr_ready;
 
-    // Assembler2 - converts bytes back to RGB pixels for grayscale
+    
     wire [CHANNELS*PIXEL_WIDTH-1:0] pixel2;
     wire pixel2_valid;
     wire pixel2_ready;
@@ -404,7 +412,7 @@ module top_pipeline_with_grayscale #(
     
     assign pixel2_ready = 1'b1;
 
-    // Grayscale core - RGB pixel to grayscale byte
+    
     wire gray_write;
     wire [7:0] gray_byte;
     wire gray_busy;
@@ -417,7 +425,7 @@ module top_pipeline_with_grayscale #(
     ) gray_inst (
         .clk(clk),
         .rst(rst),
-        .clk_en(core_clk_en[1]),  // Clock enable from agent
+        .clk_en(core_clk_en[1]),  
         .read_signal(gray_read),
         .data_in(pixel2),
         .data_out(gray_byte),
@@ -439,7 +447,7 @@ module top_pipeline_with_grayscale #(
     
     assign led_gray_busy = led_gray_r;
 
-    // Difference Amplifier - contrast enhancement
+    
     wire diffamp_write;
     wire [7:0] diffamp_byte;
     wire diffamp_busy;
@@ -455,7 +463,7 @@ module top_pipeline_with_grayscale #(
     ) diffamp_inst (
         .clk(clk),
         .rst(rst),
-        .clk_en(core_clk_en[2]),  // Clock enable from agent
+        .clk_en(core_clk_en[2]),  
         .read_signal(diffamp_read),
         .data_in(gray_byte),
         .data_out(diffamp_byte),
@@ -477,7 +485,7 @@ module top_pipeline_with_grayscale #(
     
     assign led_diffamp_busy = led_diffamp_r;
 
-    // 1D Box Blur - smoothing filter
+    
     wire blur_write;
     wire [7:0] blur_byte;
     wire blur_busy;
@@ -489,11 +497,11 @@ module top_pipeline_with_grayscale #(
     
     box_blur_1d #(
         .PIXEL_WIDTH(PIXEL_WIDTH),
-        .IMG_WIDTH(IN_WIDTH/2)  // 64x64 image after resizer
+        .IMG_WIDTH(IN_WIDTH/2)  
     ) blur_inst (
         .clk(clk),
         .rst(rst),
-        .clk_en(core_clk_en[3]),  // Clock enable from agent
+        .clk_en(core_clk_en[3]),  
         .read_signal(blur_read),
         .data_in(diffamp_byte),
         .data_out(blur_byte),
@@ -515,7 +523,7 @@ module top_pipeline_with_grayscale #(
     
     assign led_blur_busy = led_blur_r;
 
-    // FIFO3 - stores final processed grayscale bytes
+    
     wire fifo3_rd_valid;
     wire [7:0] fifo3_rd_data;
     wire fifo3_rd_ready;
@@ -541,27 +549,27 @@ module top_pipeline_with_grayscale #(
         .load_bucket(fifo3_load_bucket)
     );
 
-    // TX from FIFO3 - stream all grayscale bytes continuously
+    
     reg [7:0] tx_byte_latch;
     reg tx_byte_valid;
     reg tx_state;
-    reg [15:0] tx_byte_count;  // Count transmitted bytes to detect completion
+    reg [15:0] tx_byte_count;  
     reg image_processing_done;
     reg logger_trigger_sent;
-    reg image_tx_complete;  // Flag for when all image bytes have been transmitted
+    reg image_tx_complete;  
     
-    localparam EXPECTED_BYTES = (IN_WIDTH/2) * (IN_HEIGHT/2);  // 64*64 = 4096
-    localparam EXPECTED_RX_BYTES = IN_WIDTH * IN_HEIGHT * CHANNELS;  // 128*128*3 = 49152
+    localparam EXPECTED_BYTES = (IN_WIDTH/2) * (IN_HEIGHT/2);  
+    localparam EXPECTED_RX_BYTES = IN_WIDTH * IN_HEIGHT * CHANNELS;  
     
-    // Logger control: enable when first RX byte arrives, trigger TX after ALL image bytes sent
+    
     reg logger_enabled_reg;
     reg logger_transmit_reg;
-    reg start_new_image;  // Signal to reset byte count
-    reg [15:0] rx_byte_count;  // Track received bytes to detect new image
+    reg start_new_image;  
+    reg [15:0] rx_byte_count;  
     
-    // Logger control: simplified approach
-    reg rx_in_progress;  // Track if we're currently receiving an image
-    reg tx_in_progress;  // Track if we're transmitting processed image
+    
+    reg rx_in_progress;  
+    reg tx_in_progress;  
     
     always @(posedge clk) begin
         if (rst) begin
@@ -575,35 +583,38 @@ module top_pipeline_with_grayscale #(
             rx_in_progress <= 1'b0;
             tx_in_progress <= 1'b0;
         end else begin
-            start_new_image <= 1'b0;  // Default: clear pulse
-            logger_transmit_reg <= 1'b0;  // Default: clear pulse
+            start_new_image <= 1'b0;  
+            logger_transmit_reg <= 1'b0;  
             
-            // Detect start of new image: first RX byte when idle
+            
             if (rx_byte_valid && !rx_in_progress) begin
                 start_new_image <= 1'b1;
                 rx_in_progress <= 1'b1;
                 rx_byte_count <= 1;
-                logger_enabled_reg <= 1'b1;  // Start logging
+                logger_enabled_reg <= 1'b1;  
                 logger_trigger_sent <= 1'b0;
                 tx_in_progress <= 1'b1;
             end else if (rx_byte_valid && rx_in_progress) begin
                 rx_byte_count <= rx_byte_count + 1;
                 
-                // Check if we've received full input image
+                
                 if (rx_byte_count >= EXPECTED_RX_BYTES - 1) begin
                     rx_in_progress <= 1'b0;
                     rx_byte_count <= 0;
                 end
             end
             
-            // When TX completes, trigger logger transmission
-            if (tx_in_progress && tx_byte_count >= EXPECTED_BYTES && !logger_trigger_sent) begin
-                logger_transmit_reg <= 1'b1;  // Pulse to trigger logger
+            
+            
+            if (tx_in_progress && tx_byte_count >= EXPECTED_BYTES && !logger_trigger_sent && !tx_busy) begin
+                
+                logger_transmit_reg <= 1'b1;  
                 logger_trigger_sent <= 1'b1;
                 image_processing_done <= 1'b1;
+                logger_enabled_reg <= 1'b0;  
             end
             
-            // After logger finishes, reset for next image
+            
             if (logger_logs_transmitted) begin
                 logger_enabled_reg <= 1'b0;
                 logger_trigger_sent <= 1'b0;
@@ -611,7 +622,7 @@ module top_pipeline_with_grayscale #(
                 tx_in_progress <= 1'b0;
             end
             
-            image_tx_complete <= 1'b0;  // Not used in simple mode
+            image_tx_complete <= 1'b0;  
         end
     end
     
@@ -629,14 +640,14 @@ module top_pipeline_with_grayscale #(
         end else begin
             tx_start_reg <= 1'b0;
             
-            // Reset count when starting new image
+            
             if (start_new_image) begin
                 tx_byte_count <= 0;
             end
             
             case (tx_state)
                 1'b0: begin
-                    // Wait for FIFO data available (only in image mode)
+                    
                     if (fifo3_rd_valid && !tx_mux_state) begin
                         tx_byte_latch <= fifo3_rd_data;
                         tx_byte_valid <= 1'b1;
@@ -644,7 +655,7 @@ module top_pipeline_with_grayscale #(
                     end
                 end
                 1'b1: begin
-                    // Send byte when TX ready (only count in image mode)
+                    
                     if (!tx_busy && tx_byte_valid && !tx_mux_state) begin
                         tx_data_reg <= tx_byte_latch;
                         tx_start_reg <= 1'b1;
@@ -652,7 +663,7 @@ module top_pipeline_with_grayscale #(
                         tx_byte_count <= tx_byte_count + 1;
                         tx_state <= 1'b0;
                     end else if (tx_mux_state) begin
-                        // If switched to logger mode, reset TX state
+                        
                         tx_byte_valid <= 1'b0;
                         tx_state <= 1'b0;
                     end
@@ -661,10 +672,10 @@ module top_pipeline_with_grayscale #(
         end
     end
     
-    // FIFO read ready: assert when in idle state and FIFO has data AND in image mode
+    
     assign fifo3_rd_ready = (tx_state == 1'b0) && fifo3_rd_valid && !tx_mux_state;
 
-    // Collect core busy signals for clock agent
+    
     assign core_busy_signals[0] = resizer_state;
     assign core_busy_signals[1] = gray_busy;
     assign core_busy_signals[2] = diffamp_busy;

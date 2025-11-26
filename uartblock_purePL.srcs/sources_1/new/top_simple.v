@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
-// top_simple.v
-// Simple single-clock top: RX -> assembler1 -> resizer -> splitter -> FIFO2 -> assembler2 -> grayscale -> FIFO3 -> TX
-// No RL agent, no logger. All modules operate in same clock domain with valid/ready handshakes.
+
+
+
 
 module top_simple #(
     parameter integer PIXEL_WIDTH = 8,
@@ -19,12 +19,12 @@ module top_simple #(
     input  wire uart_rx,
     output wire uart_tx,
 
-    // simple LEDs
+    
     output wire led_rx_activity,
     output wire led_tx_activity
 );
 
-    // small compile-time clog2
+    
     function integer clog2;
         input integer value;
         integer v;
@@ -42,9 +42,9 @@ module top_simple #(
     localparam integer ADDR_W_FIFO2 = clog2(FIFO2_DEPTH);
     localparam integer ADDR_W_FIFO3 = clog2(FIFO3_DEPTH);
 
-    // ------------------------------------------------------------------
-    // UART RX/ TX
-    // ------------------------------------------------------------------
+    
+    
+    
     wire [7:0] rx_byte;
     wire       rx_byte_valid;
 
@@ -72,10 +72,10 @@ module top_simple #(
         .tx_busy(tx_busy)
     );
 
-    // ------------------------------------------------------------------
-    // LED pulse stretchers
-    // ------------------------------------------------------------------
-    localparam integer LED_PULSE_CYCLES = 500000; // ~5ms at 100MHz
+    
+    
+    
+    localparam integer LED_PULSE_CYCLES = 500000; 
     reg [22:0] rx_led_cnt;
     reg [22:0] tx_led_cnt;
     reg led_rx_r;
@@ -94,7 +94,7 @@ module top_simple #(
         end
     end
 
-    // capture tx activity (pulse on tx_start or rising tx_busy)
+    
     reg tx_busy_prev;
     always @(posedge clk) begin
         if (rst) begin
@@ -114,9 +114,9 @@ module top_simple #(
     assign led_rx_activity = led_rx_r;
     assign led_tx_activity = led_tx_r;
 
-    // ------------------------------------------------------------------
-    // FIFO1: RX bytes -> assembler1
-    // ------------------------------------------------------------------
+    
+    
+    
     wire fifo1_wr_ready;
     wire fifo1_rd_valid;
     wire [7:0] fifo1_rd_data;
@@ -140,7 +140,7 @@ module top_simple #(
         .load_bucket(fifo1_load_bucket)
     );
 
-    // assembler1: bytes -> pixel
+    
     wire [CHANNELS*PIXEL_WIDTH-1:0] pixel1;
     wire pixel1_valid;
     wire pixel1_ready;
@@ -156,11 +156,11 @@ module top_simple #(
         .pixel_ready(pixel1_ready)
     );
 
-    assign pixel1_ready = 1'b1; // always ready
+    assign pixel1_ready = 1'b1; 
 
-    // ------------------------------------------------------------------
-    // Resizer (read when pixel available)
-    // ------------------------------------------------------------------
+    
+    
+    
     wire [CHANNELS*PIXEL_WIDTH-1:0] res_out_pixel;
     wire res_valid;
     wire res_frame_done;
@@ -182,12 +182,12 @@ module top_simple #(
         .data_out(res_out_pixel),
         .write_signal(res_valid),
         .frame_done(res_frame_done),
-        .state() // unused
+        .state() 
     );
 
-    // ------------------------------------------------------------------
-    // Pixel Splitter -> FIFO2
-    // ------------------------------------------------------------------
+    
+    
+    
     wire splitter_wr_valid;
     wire [7:0] splitter_wr_data;
     wire splitter_wr_ready;
@@ -228,7 +228,7 @@ module top_simple #(
 
     assign splitter_wr_ready = fifo2_wr_ready;
 
-    // assembler2: bytes -> pixel2
+    
     wire [CHANNELS*PIXEL_WIDTH-1:0] pixel2;
     wire pixel2_valid;
     wire pixel2_ready;
@@ -246,9 +246,9 @@ module top_simple #(
 
     assign pixel2_ready = 1'b1;
 
-    // ------------------------------------------------------------------
-    // Grayscale core
-    // ------------------------------------------------------------------
+    
+    
+    
     wire gray_read_pulse = pixel2_valid & pixel2_ready;
     wire [7:0] gray_byte;
     wire gray_valid;
@@ -264,12 +264,12 @@ module top_simple #(
         .read_signal(gray_read_pulse),
         .data_out(gray_byte),
         .write_signal(gray_valid),
-        .state() // unused
+        .state() 
     );
 
-    // ------------------------------------------------------------------
-    // FIFO3: grayscale -> TX
-    // ------------------------------------------------------------------
+    
+    
+    
     wire fifo3_wr_ready;
     wire fifo3_rd_valid;
     wire [7:0] fifo3_rd_data;
@@ -293,9 +293,9 @@ module top_simple #(
         .load_bucket(fifo3_load_bucket)
     );
 
-    // ------------------------------------------------------------------
-    // Simple TX FSM: stream FIFO3 bytes, then send sentinel "/0/0"
-    // ------------------------------------------------------------------
+    
+    
+    
     localparam S_IDLE   = 2'd0;
     localparam S_STREAM = 2'd1;
     localparam S_MARK0  = 2'd2;
@@ -314,9 +314,9 @@ module top_simple #(
             fifo_latched <= 8'h00;
             fifo_latched_valid <= 1'b0;
         end else begin
-            // default
+            
             tx_start_reg <= 1'b0;
-            // drive rd_ready when FIFO has data and we don't have it latched
+            
             fifo3_rd_ready_reg <= (fifo3_rd_valid && !fifo_latched_valid);
 
             case (state)

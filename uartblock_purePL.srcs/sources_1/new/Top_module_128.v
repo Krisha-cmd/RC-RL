@@ -14,37 +14,37 @@ module top_module_128 #(
     output wire uart_tx
 );
 
-    //----------------------------------------------------------
-    // Reset
-    //----------------------------------------------------------
+    
+    
+    
     wire rst = 1'b1;
 
-    //----------------------------------------------------------
-    // Address pointers
-    //----------------------------------------------------------
+    
+    
+    
     reg [ADDR_WIDTH-1:0] write_addr = 0;
     reg [ADDR_WIDTH-1:0] read_addr  = 0;
 
-    //----------------------------------------------------------
-    // UART RX wires
-    //----------------------------------------------------------
+    
+    
+    
     wire [PIXEL_WIDTH-1:0] rx_byte;
     wire                   rx_byte_valid;
 
-    //----------------------------------------------------------
-    // BRAM read output
-    //----------------------------------------------------------
+    
+    
+    
     wire [PIXEL_WIDTH-1:0] read_pixel;
 
-    //----------------------------------------------------------
-    // TX control
-    //----------------------------------------------------------
+    
+    
+    
     reg                    tx_start = 0;
     reg [PIXEL_WIDTH-1:0]  tx_data  = 0;
 
-    //----------------------------------------------------------
-    // UART RECEIVER
-    //----------------------------------------------------------
+    
+    
+    
     rx #(
         .CLOCK_FREQ(CLOCK_FREQ),
         .BAUD_RATE(BAUD_RATE)
@@ -56,9 +56,9 @@ module top_module_128 #(
         .rx_byte_valid(rx_byte_valid)
     );
 
-    //----------------------------------------------------------
-    // BRAM
-    //----------------------------------------------------------
+    
+    
+    
     bram_11 #(
         .IMG_WIDTH(IMG_WIDTH),
         .IMG_HEIGHT(IMG_HEIGHT),
@@ -68,19 +68,19 @@ module top_module_128 #(
         .clk(clk),
         .rst(rst),
 
-        // write port
+        
         .write_data(rx_byte),
         .write_valid(rx_byte_valid),
         .write_addr(write_addr),
 
-        // read port
+        
         .read_addr(read_addr),
         .read_data(read_pixel)
     );
 
-    //----------------------------------------------------------
-    // UART TRANSMITTER
-    //----------------------------------------------------------
+    
+    
+    
     tx #(
         .CLOCK_FREQ(CLOCK_FREQ),
         .BAUD_RATE(BAUD_RATE)
@@ -92,9 +92,9 @@ module top_module_128 #(
         .tx_data(tx_data)
     );
 
-    //----------------------------------------------------------
-    // WRITE POINTER LOGIC (BRAM Write)
-    //----------------------------------------------------------
+    
+    
+    
     always @(posedge clk) begin
         if (rst==1'b1)
             write_addr <= 0;
@@ -102,9 +102,9 @@ module top_module_128 #(
             write_addr <= write_addr + 1;
     end
 
-    //----------------------------------------------------------
-    // READ → TX LOGIC (1-cycle delayed read for BRAM)
-    //----------------------------------------------------------
+    
+    
+    
     reg rx_valid_dly = 0;
 
     always @(posedge clk) begin
@@ -113,13 +113,13 @@ module top_module_128 #(
             rx_valid_dly <= 0;
             tx_start    <= 0;
         end else begin
-            // delay RX valid so BRAM read data is ready
+            
             rx_valid_dly <= rx_byte_valid;
 
-            // 1 cycle after BRAM write, read_pixel is valid
+            
             if (rx_valid_dly) begin
-                tx_data <= read_pixel; // correct byte
-                tx_start <= 1'b1;      // pulse
+                tx_data <= read_pixel; 
+                tx_start <= 1'b1;      
                 read_addr <= read_addr + 1;
             end else begin
                 tx_start <= 1'b0;

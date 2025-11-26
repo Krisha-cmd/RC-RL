@@ -11,7 +11,7 @@ module clock_module (
     output reg         ce_resizer,
     output reg         ce_grayscale,
 
-    // expose divider values for logging
+    
     output reg [7:0]   divider_resizer,
     output reg [7:0]   divider_gray
 );
@@ -36,7 +36,7 @@ module clock_module (
                     divider_gray <= freq_code;
             end
 
-            // RESIZER CE
+            
             if (cnt_resizer == divider_resizer-1) begin
                 ce_resizer <= 1;
                 cnt_resizer <= 0;
@@ -45,7 +45,7 @@ module clock_module (
                 cnt_resizer <= cnt_resizer + 1;
             end
 
-            // GRAYSCALE CE
+            
             if (cnt_gray == divider_gray-1) begin
                 ce_grayscale <= 1;
                 cnt_gray <= 0;

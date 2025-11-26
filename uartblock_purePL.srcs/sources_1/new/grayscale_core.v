@@ -7,22 +7,22 @@ module grayscale_core #(
 )(
     input  wire                     clk,
     input  wire                     rst,
-    input  wire                     clk_en,        // clock enable from agent
+    input  wire                     clk_en,        
 
     input  wire [3*PIXEL_WIDTH-1:0] data_in,    
     input  wire                     read_signal,
 
     output reg  [PIXEL_WIDTH-1:0]   data_out,
     output reg                      write_signal,
-    output reg                      state         // 1 when busy, else 0
+    output reg                      state         
 );
 
-    // Extract channels
+    
     wire [7:0] r = data_in[3*PIXEL_WIDTH-1 : 2*PIXEL_WIDTH];
     wire [7:0] g = data_in[2*PIXEL_WIDTH-1 : 1*PIXEL_WIDTH];
     wire [7:0] b = data_in[1*PIXEL_WIDTH-1 : 0];
 
-    // gray = (77R + 150G + 29B) >> 8
+    
     wire [15:0] gray_mult = 16'd77  * r +
                             16'd150 * g +
                             16'd29  * b;
@@ -36,10 +36,10 @@ module grayscale_core #(
             state        <= 1'b0;
         end else if (clk_en) begin
             write_signal <= 1'b0;    
-            state        <= 1'b0;    // default: idle
+            state        <= 1'b0;    
 
             if (read_signal) begin
-                state        <= 1'b1;    // ACTIVE for 1 cycle
+                state        <= 1'b1;    
                 data_out     <= gray;
                 write_signal <= 1'b1;    
             end

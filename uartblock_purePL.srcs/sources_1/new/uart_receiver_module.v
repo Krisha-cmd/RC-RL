@@ -1,60 +1,60 @@
 
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 11/10/2025 12:29:15 PM
-// Design Name: 
-// Module Name: uart_receiver_module
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
 
-// UART RX (8N1), 16x oversample receiver.
-// Parameters: CLOCK_FREQ (Hz), BAUD_RATE (bps).
-// Instantiation in top uses CLOCK_FREQ = 100_000_000 for ZedBoard.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 module uart_receiver_module #(
     parameter integer CLOCK_FREQ = 100_000_000,
     parameter integer BAUD_RATE  = 115200
 )(
-    input  wire        clk,        // system clock (100 MHz recommended)
-    input  wire        rst,      // active low reset
-    input  wire        rx,         // serial input (UART TX from adapter -> this rx)
-    output reg  [7:0]  rx_byte,    // received byte
-    output reg         rx_byte_valid // 1-clock pulse when rx_byte is valid
+    input  wire        clk,        
+    input  wire        rst,      
+    input  wire        rx,         
+    output reg  [7:0]  rx_byte,    
+    output reg         rx_byte_valid 
 );
 
     localparam integer OVERSAMPLE = 16;
-    // sample divider: CLOCK_FREQ / (BAUD_RATE * OVERSAMPLE)
+    
     localparam integer SAMPLE_CLK_DIV = (CLOCK_FREQ + (BAUD_RATE*OVERSAMPLE)/2) / (BAUD_RATE*OVERSAMPLE);
 
-    // state machine
+    
     localparam IDLE  = 2'd0;
     localparam START = 2'd1;
     localparam DATA  = 2'd2;
     localparam STOP  = 2'd3;
 
     reg [1:0] state;
-    reg [4:0] sample_cnt; // enough for OVERSAMPLE up to 16
+    reg [4:0] sample_cnt; 
     reg [2:0] bit_index;
     reg [7:0] shift_reg;
     reg rx_sync0, rx_sync1;
 
-    // clock divider
+    
     reg [31:0] clk_div_cnt;
     wire sample_tick = (clk_div_cnt == 0);
 
-    // Sync rx to clock domain
+    
     always @(posedge clk or posedge rst) begin
         if (rst==1'b1) begin
             rx_sync0 <= 1'b1;
@@ -65,7 +65,7 @@ module uart_receiver_module #(
         end
     end
 
-    // clock divider for oversample ticks
+    
     always @(posedge clk or posedge rst) begin
         if (rst==1'b1) begin
             clk_div_cnt <= 0;
@@ -77,7 +77,7 @@ module uart_receiver_module #(
         end
     end
 
-    // FSM: sample at OVERSAMPLE ticks.
+    
     always @(posedge clk or posedge rst) begin
         if (rst==1'b1) begin
             state <= IDLE;
@@ -91,14 +91,14 @@ module uart_receiver_module #(
             if (sample_tick) begin
                 case (state)
                     IDLE: begin
-                        if (rx_sync1 == 1'b0) begin // start bit candidate
+                        if (rx_sync1 == 1'b0) begin 
                             state <= START;
                             sample_cnt <= 0;
                         end
                     end
                     START: begin
                         sample_cnt <= sample_cnt + 1;
-                        // sample in middle of start bit
+                        
                         if (sample_cnt == (OVERSAMPLE/2 - 1)) begin
                             if (rx_sync1 == 1'b0) begin
                                 state <= DATA;
@@ -114,7 +114,7 @@ module uart_receiver_module #(
                         sample_cnt <= sample_cnt + 1;
                         if (sample_cnt == OVERSAMPLE - 1) begin
                             sample_cnt <= 0;
-                            shift_reg[bit_index] <= rx_sync1; // LSB first
+                            shift_reg[bit_index] <= rx_sync1; 
                             if (bit_index == 7) begin
                                 state <= STOP;
                             end else begin

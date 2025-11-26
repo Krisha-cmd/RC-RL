@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2025.1 (win64) Build 6140274 Thu May 22 00:12:29 MDT 2025
-| Date             : Wed Nov 26 19:22:24 2025
+| Date             : Wed Nov 26 21:50:23 2025
 | Host             : BOOK-JBCPDRK7D5 running 64-bit major release  (build 9200)
 | Command          : report_power -file top_pipeline_with_grayscale_power_routed.rpt -pb top_pipeline_with_grayscale_power_summary_routed.pb -rpx top_pipeline_with_grayscale_power_routed.rpx
 | Design           : top_pipeline_with_grayscale
@@ -30,10 +30,10 @@ Table of Contents
 ----------
 
 +--------------------------+----------------------------------+
-| Total On-Chip Power (W)  | 15.454 (Junction temp exceeded!) |
+| Total On-Chip Power (W)  | 15.246 (Junction temp exceeded!) |
 | Design Power Budget (W)  | Unspecified*                     |
 | Power Budget Margin (W)  | NA                               |
-| Dynamic (W)              | 14.405                           |
+| Dynamic (W)              | 14.196                           |
 | Device Static (W)        | 1.049                            |
 | Effective TJA (C/W)      | 11.5                             |
 | Max Ambient (C)          | 0.0                              |
@@ -52,19 +52,19 @@ Table of Contents
 +--------------------------+-----------+----------+-----------+-----------------+
 | On-Chip                  | Power (W) | Used     | Available | Utilization (%) |
 +--------------------------+-----------+----------+-----------+-----------------+
-| Slice Logic              |     6.117 |    16543 |       --- |             --- |
-|   LUT as Logic           |     5.025 |     3921 |     53200 |            7.37 |
-|   CARRY4                 |     0.699 |      176 |     13300 |            1.32 |
-|   Register               |     0.387 |    10384 |    106400 |            9.76 |
+| Slice Logic              |     6.060 |    16563 |       --- |             --- |
+|   LUT as Logic           |     4.980 |     3934 |     53200 |            7.39 |
+|   CARRY4                 |     0.682 |      176 |     13300 |            1.32 |
+|   Register               |     0.392 |    10384 |    106400 |            9.76 |
 |   BUFG                   |     0.006 |        1 |        32 |            3.13 |
-|   F7/F8 Muxes            |    <0.001 |     1801 |     53200 |            3.39 |
-|   LUT as Distributed RAM |    <0.001 |       48 |     17400 |            0.28 |
 |   Others                 |     0.000 |       38 |       --- |             --- |
-| Signals                  |     7.505 |    12426 |       --- |             --- |
-| Block RAM                |     0.774 |        5 |       140 |            3.57 |
+|   F7/F8 Muxes            |     0.000 |     1801 |     53200 |            3.39 |
+|   LUT as Distributed RAM |     0.000 |       48 |     17400 |            0.28 |
+| Signals                  |     7.352 |    12446 |       --- |             --- |
+| Block RAM                |     0.775 |        5 |       140 |            3.57 |
 | I/O                      |     0.008 |       11 |       200 |            5.50 |
 | Static Power             |     1.049 |          |           |                 |
-| Total                    |    15.454 |          |           |                 |
+| Total                    |    15.246 |          |           |                 |
 +--------------------------+-----------+----------+-----------+-----------------+
 
 
@@ -74,7 +74,7 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
-| Vccint    |       1.000 |    14.644 |      14.343 |      0.301 |       NA    | Unspecified | NA         |
+| Vccint    |       1.000 |    14.436 |      14.134 |      0.301 |       NA    | Unspecified | NA         |
 | Vccaux    |       1.800 |     0.100 |       0.000 |      0.100 |       NA    | Unspecified | NA         |
 | Vcco33    |       3.300 |     0.001 |       0.000 |      0.001 |       NA    | Unspecified | NA         |
 | Vcco25    |       2.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
@@ -148,25 +148,25 @@ Table of Contents
 +-----------------------------+-----------+
 | Name                        | Power (W) |
 +-----------------------------+-----------+
-| top_pipeline_with_grayscale |    14.405 |
-|   assembler1                |     0.197 |
-|   assembler2                |     0.465 |
-|   blur_inst                 |     0.528 |
-|   clock_agent_inst          |     0.025 |
-|   diffamp_inst              |     0.395 |
-|   fifo1                     |     2.244 |
-|     bram_inst               |     0.478 |
-|   fifo2                     |     2.723 |
-|     bram_inst               |     0.541 |
-|   fifo3                     |     1.779 |
-|     bram_inst               |     0.155 |
-|   gray_inst                 |     0.983 |
-|   logger_inst               |     0.696 |
-|   resizer_inst              |     0.363 |
-|   rl_agent_inst             |     0.419 |
-|   rx_inst                   |     0.886 |
-|   splitter_inst             |     0.167 |
-|   tx_inst                   |     0.624 |
+| top_pipeline_with_grayscale |    14.196 |
+|   assembler1                |     0.182 |
+|   assembler2                |     0.435 |
+|   blur_inst                 |     0.527 |
+|   clock_agent_inst          |     0.026 |
+|   diffamp_inst              |     0.379 |
+|   fifo1                     |     2.210 |
+|     bram_inst               |     0.454 |
+|   fifo2                     |     2.659 |
+|     bram_inst               |     0.609 |
+|   fifo3                     |     1.936 |
+|     bram_inst               |     0.188 |
+|   gray_inst                 |     1.017 |
+|   logger_inst               |     0.489 |
+|   resizer_inst              |     0.353 |
+|   rl_agent_inst             |     0.376 |
+|   rx_inst                   |     0.863 |
+|   splitter_inst             |     0.169 |
+|   tx_inst                   |     0.661 |
 +-----------------------------+-----------+
 
 

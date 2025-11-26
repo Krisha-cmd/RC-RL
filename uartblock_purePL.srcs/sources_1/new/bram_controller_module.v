@@ -1,23 +1,23 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 11/10/2025 02:41:56 PM
-// Design Name: 
-// Module Name: bram_controller_module
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 module bram_controller_module #(
     parameter integer IMG_WIDTH   = 64,
     parameter integer IMG_HEIGHT  = 48,
@@ -35,7 +35,7 @@ module bram_controller_module #(
     output reg [ADDR_WIDTH-1:0]    write_addr
 );
 
-    // Infer block RAM
+    
     (* ram_style = "block" *) reg [PIXEL_WIDTH-1:0] mem [0:IMG_SIZE-1];
     reg [ADDR_WIDTH-1:0] write_ptr;
 
@@ -59,7 +59,7 @@ module bram_controller_module #(
         end
     end
 
-    // synchronous read port
+    
     always @(posedge clk) begin
         read_data <= mem[read_addr];
     end

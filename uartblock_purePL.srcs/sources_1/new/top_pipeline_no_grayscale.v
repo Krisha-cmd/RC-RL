@@ -1,8 +1,8 @@
 `timescale 1ns / 1ps
-// top_pipeline_no_grayscale.v
-// Pipeline: RX -> FIFO1 -> assembler1 -> resizer -> splitter -> FIFO2 -> TX
-// No grayscale stage; sends resized RGB bytes back over UART.
-// Single clock domain, no RL throttling for reliable throughput.
+
+
+
+
 
 module top_pipeline_no_grayscale #(
     parameter integer PIXEL_WIDTH = 8,
@@ -26,14 +26,14 @@ module top_pipeline_no_grayscale #(
     localparam ADDR_W_FIFO1 = clog2(FIFO1_DEPTH);
     localparam ADDR_W_FIFO2 = clog2(FIFO2_DEPTH);
 
-    // UART
+    
     wire [7:0] rx_byte; wire rx_byte_valid;
     rx rx_inst (.clk(clk), .rst(rst), .rx(uart_rx), .rx_byte(rx_byte), .rx_byte_valid(rx_byte_valid));
 
     reg tx_start_reg; reg [7:0] tx_data_reg; wire tx_busy;
     tx #(.CLOCK_FREQ(100_000_000), .BAUD_RATE(115200)) tx_inst (.clk(clk), .rst(rst), .tx(uart_tx), .tx_start(tx_start_reg), .tx_data(tx_data_reg), .tx_busy(tx_busy));
 
-    // LEDs
+    
     localparam integer LED_PULSE_CYCLES = 500000;
     reg [22:0] rx_led_cnt, tx_led_cnt, resizer_led_cnt, gray_led_cnt;
     reg led_rx_r, led_tx_r, led_resizer_r, led_gray_r; reg tx_busy_prev;
@@ -41,7 +41,7 @@ module top_pipeline_no_grayscale #(
     always @(posedge clk) begin if (rst) begin tx_led_cnt<=0; led_tx_r<=1'b0; tx_busy_prev<=1'b0; end else begin if (tx_start_reg || (tx_busy && !tx_busy_prev)) tx_led_cnt<=LED_PULSE_CYCLES; else if (tx_led_cnt!=0) tx_led_cnt<=tx_led_cnt-1; led_tx_r<=(tx_led_cnt!=0); tx_busy_prev<=tx_busy; end end
     assign led_rx_activity = led_rx_r; assign led_tx_activity = led_tx_r;
 
-    // FIFO1
+    
     wire fifo1_wr_ready; wire fifo1_rd_valid; wire [7:0] fifo1_rd_data; wire [2:0] fifo1_load_bucket; wire fifo1_rd_ready;
     bram_fifo #(.DEPTH(FIFO1_DEPTH), .ADDR_WIDTH(ADDR_W_FIFO1)) fifo1 (.wr_clk(clk), .wr_rst(rst), .wr_valid(rx_byte_valid), .wr_ready(fifo1_wr_ready), .wr_data(rx_byte), .rd_clk(clk), .rd_rst(rst), .rd_valid(fifo1_rd_valid), .rd_ready(fifo1_rd_ready), .rd_data(fifo1_rd_data), .wr_count_sync(), .rd_count_sync(), .load_bucket(fifo1_load_bucket));
 
@@ -49,7 +49,7 @@ module top_pipeline_no_grayscale #(
     pixel_assembler #(.PIXEL_WIDTH(PIXEL_WIDTH), .CHANNELS(CHANNELS)) assembler1 (.clk(clk), .rst(rst), .bram_rd_valid(fifo1_rd_valid), .bram_rd_ready(fifo1_rd_ready), .bram_rd_data(fifo1_rd_data), .pixel_out(pixel1), .pixel_valid(pixel1_valid), .pixel_ready(pixel1_ready));
     assign pixel1_ready = 1'b1;
 
-    // Resizer (no clock gating - run at full speed for reliable throughput)
+    
     wire [CHANNELS*PIXEL_WIDTH-1:0] res_out_pixel; wire res_valid; wire res_frame_done; wire resizer_state;
     wire resizer_read;
     assign resizer_read = pixel1_valid & pixel1_ready;
@@ -57,7 +57,7 @@ module top_pipeline_no_grayscale #(
     always @(posedge clk) begin if (rst) begin resizer_led_cnt<=0; led_resizer_r<=1'b0; end else if (resizer_state) resizer_led_cnt<=LED_PULSE_CYCLES; else if (resizer_led_cnt!=0) resizer_led_cnt<=resizer_led_cnt-1; led_resizer_r <= (resizer_led_cnt!=0); end
     assign led_resizer_busy = led_resizer_r; assign led_gray_busy = 1'b0;
 
-    // Splitter -> FIFO2
+    
     wire splitter_wr_valid;
     wire [7:0] splitter_wr_data;
     wire splitter_wr_ready;
@@ -102,7 +102,7 @@ module top_pipeline_no_grayscale #(
     
     assign splitter_wr_ready = fifo2_wr_ready;
 
-    // TX from FIFO2 - stream all RGB bytes continuously
+    
     reg [7:0] tx_byte_latch;
     reg tx_byte_valid;
     reg tx_state;
@@ -119,7 +119,7 @@ module top_pipeline_no_grayscale #(
             
             case (tx_state)
                 1'b0: begin
-                    // Wait for FIFO data available
+                    
                     if (fifo2_rd_valid) begin
                         tx_byte_latch <= fifo2_rd_data;
                         tx_byte_valid <= 1'b1;
@@ -127,7 +127,7 @@ module top_pipeline_no_grayscale #(
                     end
                 end
                 1'b1: begin
-                    // Send byte when TX ready
+                    
                     if (!tx_busy && tx_byte_valid) begin
                         tx_data_reg <= tx_byte_latch;
                         tx_start_reg <= 1'b1;
@@ -139,7 +139,7 @@ module top_pipeline_no_grayscale #(
         end
     end
     
-    // FIFO read ready: assert when in idle state and FIFO has data
+    
     assign fifo2_rd_ready = (tx_state == 1'b0) && fifo2_rd_valid;
 
 endmodule

@@ -1,8 +1,8 @@
 `timescale 1ns / 1ps
 
-// 1D Box Blur - simple 3-tap moving average filter
-// output = (prev + current + next) / 3
-// Uses a sliding window of 3 pixels
+
+
+
 
 module box_blur_1d #(
     parameter integer PIXEL_WIDTH = 8,
@@ -10,26 +10,26 @@ module box_blur_1d #(
 )(
     input  wire                     clk,
     input  wire                     rst,
-    input  wire                     clk_en,        // clock enable from agent
+    input  wire                     clk_en,        
 
     input  wire [PIXEL_WIDTH-1:0]   data_in,
     input  wire                     read_signal,
 
     output reg  [PIXEL_WIDTH-1:0]   data_out,
     output reg                      write_signal,
-    output reg                      state  // 1 when busy, else 0
+    output reg                      state  
 );
 
-    // Sliding window registers
+    
     reg [PIXEL_WIDTH-1:0] prev;
     reg [PIXEL_WIDTH-1:0] curr;
     reg [PIXEL_WIDTH-1:0] next;
     
-    // Pixel counter to track position in image
-    reg [15:0] pixel_count;
-    reg [1:0] startup_state;  // 0=empty, 1=one pixel, 2=two pixels, 3=running
     
-    // Computation register
+    reg [15:0] pixel_count;
+    reg [1:0] startup_state;  
+    
+    
     reg [9:0] sum;
     
     always @(posedge clk or posedge rst) begin
@@ -50,7 +50,7 @@ module box_blur_1d #(
             if (read_signal) begin
                 state <= 1'b1;
                 
-                // Shift the sliding window
+                
                 prev <= curr;
                 curr <= next;
                 next <= data_in;
@@ -59,28 +59,28 @@ module box_blur_1d #(
                 
                 case (startup_state)
                     2'd0: begin
-                        // First pixel - just store
+                        
                         startup_state <= 2'd1;
                     end
                     2'd1: begin
-                        // Second pixel - still building window
+                        
                         startup_state <= 2'd2;
                     end
                     2'd2: begin
-                        // Third pixel - window complete, start outputting
+                        
                         startup_state <= 2'd3;
-                        // Compute average of 2 pixels (less smoothing)
+                        
                         sum = {2'b0, curr} + {2'b0, next};
-                        data_out <= sum[8:1];  // Divide by 2 (simple average)
+                        data_out <= sum[8:1];  
                         write_signal <= 1'b1;
                     end
                     2'd3: begin
-                        // Running state - compute 2-tap average (lighter blur)
+                        
                         sum = {2'b0, curr} + {2'b0, next};
-                        data_out <= sum[8:1];  // (curr+next)/2 - less aggressive smoothing
+                        data_out <= sum[8:1];  
                         write_signal <= 1'b1;
                         
-                        // Reset at end of frame (assuming 64x64 = 4096 pixels)
+                        
                         if (pixel_count >= (IMG_WIDTH * IMG_WIDTH - 1)) begin
                             pixel_count <= 16'd0;
                             startup_state <= 2'd0;

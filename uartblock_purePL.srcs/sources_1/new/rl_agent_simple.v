@@ -1,12 +1,12 @@
 `timescale 1ns / 1ps
-// rl_agent_simple.v
-// Simple RL agent that periodically asserts a valid pulse and toggles a core mask
+
+
 
 module rl_agent_simple #(
     parameter integer INTERVAL = 2000000
 )(
     input  wire clk,
-    input  wire rst,            // active-high
+    input  wire rst,            
     output reg  rl_valid,
     output reg [1:0] core_mask,
     output reg [7:0] freq_code

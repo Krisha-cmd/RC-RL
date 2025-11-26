@@ -5,14 +5,14 @@ module pixel_assembler #(
 )(
     input  wire clk,
     input  wire rst,
-    // BRAM FIFO read interface (consumer side)
-    input  wire bram_rd_valid,    // from bram_fifo
-    output reg  bram_rd_ready,    // assert to pop a byte
+    
+    input  wire bram_rd_valid,    
+    output reg  bram_rd_ready,    
     input  wire [7:0] bram_rd_data,
-    // Downstream pixel interface (resizer)
+    
     output reg  [CHANNELS*PIXEL_WIDTH-1:0] pixel_out,
     output reg  pixel_valid,
-    input  wire pixel_ready       // downstream ready to accept pixel
+    input  wire pixel_ready       
 );
     reg [2:0] state;
     reg [7:0] b0, b1, b2;
@@ -29,20 +29,20 @@ module pixel_assembler #(
             bram_rd_ready <= 0;
             case (state)
                 3'd0: begin
-                    // Request first byte
+                    
                     if (bram_rd_valid) begin
                         bram_rd_ready <= 1'b1;
                         state <= 3'd1;
                     end
                 end
                 3'd1: begin
-                    // Wait 1 cycle for BRAM read latency (BRAM output updates this cycle)
+                    
                     state <= 3'd2;
                 end
                 3'd2: begin
-                    // Latch first byte (valid now after BRAM latency)
+                    
                     b0 <= bram_rd_data;
-                    // Request second byte
+                    
                     if (bram_rd_valid) begin
                         bram_rd_ready <= 1'b1;
                         state <= 3'd3;
@@ -51,13 +51,13 @@ module pixel_assembler #(
                     end
                 end
                 3'd3: begin
-                    // Wait for BRAM
+                    
                     state <= 3'd4;
                 end
                 3'd4: begin
-                    // Latch second byte
+                    
                     b1 <= bram_rd_data;
-                    // Request third byte
+                    
                     if (bram_rd_valid) begin
                         bram_rd_ready <= 1'b1;
                         state <= 3'd5;
@@ -66,18 +66,18 @@ module pixel_assembler #(
                     end
                 end
                 3'd5: begin
-                    // Wait for BRAM
+                    
                     state <= 3'd6;
                 end
                 3'd6: begin
-                    // Latch third byte and output pixel
+                    
                     b2 <= bram_rd_data;
                     if (pixel_ready) begin
-                        pixel_out <= {b0, b1, bram_rd_data}; // {R,G,B}
+                        pixel_out <= {b0, b1, bram_rd_data}; 
                         pixel_valid <= 1'b1;
                         state <= 3'd0;
                     end else begin
-                        // Wait for downstream to be ready
+                        
                         pixel_out <= {b0, b1, bram_rd_data};
                         state <= 3'd6;
                     end

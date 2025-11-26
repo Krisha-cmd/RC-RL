@@ -1,18 +1,18 @@
 `timescale 1ns / 1ps
-// rl_agent.v
-// Simple FSM that issues frequency commands every INTERVAL cycles.
-// Can issue single-core updates or multi-core updates using core_mask.
+
+
+
 
 module rl_agent #(
-    parameter integer INTERVAL = 20  // trigger every N cycles
+    parameter integer INTERVAL = 20  
 )(
     input  wire clk,
     input  wire rst,
 
-    // output command (pulse of 1 cycle)
+    
     output reg        rl_valid,
-    output reg [1:0]  core_mask,   // bit0=resizer, bit1=grayscale
-    output reg [7:0]  freq_code    // divider to program
+    output reg [1:0]  core_mask,   
+    output reg [7:0]  freq_code    
 );
 
     reg [31:0] cycle_counter;
@@ -30,7 +30,7 @@ module rl_agent #(
             freq_code <= 8'd1;
             state <= S_IDLE;
         end else begin
-            // default deassert
+            
             rl_valid <= 1'b0;
 
             case (state)
@@ -44,18 +44,18 @@ module rl_agent #(
                 end
 
                 S_SEND1: begin
-                    // Example behaviour: alternate simple policies
-                    // Here we set resizer to divide by 4 (1/4 rate)
+                    
+                    
                     rl_valid <= 1'b1;
-                    core_mask <= 2'b01;    // only resizer
+                    core_mask <= 2'b01;    
                     freq_code <= 8'd4;
                     state <= S_SEND2;
                 end
 
                 S_SEND2: begin
-                    // Second command: set both cores to divide-by-2
+                    
                     rl_valid <= 1'b1;
-                    core_mask <= 2'b11;    // both cores
+                    core_mask <= 2'b11;    
                     freq_code <= 8'd2;
                     state <= S_IDLE;
                 end

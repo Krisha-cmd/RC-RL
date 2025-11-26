@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 
-// Stage 1: Resizer Core (2x downscale, nearest neighbour)
-// PURE COMPUTE MODULE (stall-capable)
+
+
 
 module resizer_core #(
     parameter integer IN_WIDTH      = 128,
@@ -13,18 +13,18 @@ module resizer_core #(
 )(
     input  wire                             clk,
     input  wire                             rst,
-    input  wire                             clk_en,        // clock enable from agent
+    input  wire                             clk_en,        
 
     input  wire [CHANNELS*PIXEL_WIDTH-1:0]  data_in,
-    input  wire                             read_signal,   // pulse: consume 1 pixel
+    input  wire                             read_signal,   
 
-    output reg  [CHANNELS*PIXEL_WIDTH-1:0]  data_out,      // resized pixel out
-    output reg                              write_signal,  // output valid
-    output reg                              frame_done,    // frame completed
-    output reg                              state          // activity flag (busy=1)
+    output reg  [CHANNELS*PIXEL_WIDTH-1:0]  data_out,      
+    output reg                              write_signal,  
+    output reg                              frame_done,    
+    output reg                              state          
 );
 
-    // Bits needed to represent pixel coordinates
+    
     localparam integer IN_W_BITS = $clog2(IN_WIDTH);
     localparam integer IN_H_BITS = $clog2(IN_HEIGHT);
 
@@ -40,33 +40,33 @@ module resizer_core #(
             frame_done   <= 0;
             state        <= 0;
         end else if (clk_en) begin
-            // defaults each cycle
+            
             write_signal <= 0;
             frame_done   <= 0;
             state        <= 0;
 
             if (read_signal) begin
-                state <= 1;  // ACTIVE this cycle
+                state <= 1;  
 
-                // -----------------------------
-                // Output pixel only when x,y even
-                // -----------------------------
+                
+                
+                
                 if ((x[0] == 1'b0) && (y[0] == 1'b0) &&
                     (x < 2*OUT_WIDTH) &&
                     (y < 2*OUT_HEIGHT)) begin
                     data_out     <= data_in;
-                    write_signal <= 1;   // 1-cycle valid pulse
+                    write_signal <= 1;   
                 end
 
-                // -----------------------------
-                // Increment pixel coordinate
-                // -----------------------------
+                
+                
+                
                 if (x == IN_WIDTH - 1) begin
                     x <= 0;
 
                     if (y == IN_HEIGHT - 1) begin
                         y <= 0;
-                        frame_done <= 1;   // signal end-of-frame
+                        frame_done <= 1;   
                     end else begin
                         y <= y + 1;
                     end

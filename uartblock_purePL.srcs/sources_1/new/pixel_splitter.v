@@ -5,11 +5,11 @@ module pixel_splitter #(
 )(
     input  wire clk,
     input  wire rst,
-    // Resizer output
+    
     input  wire [CHANNELS*PIXEL_WIDTH-1:0] pixel_in,
     input  wire pixel_in_valid,
     output reg  pixel_in_ready,
-    // BRAM FIFO write interface (producer)
+    
     output reg  bram_wr_valid,
     input  wire bram_wr_ready,
     output reg  [7:0] bram_wr_data
@@ -25,7 +25,7 @@ module pixel_splitter #(
             pixel_in_ready <= 0;
             pixel_reg <= 0;
         end else begin
-            // default
+            
             pixel_in_ready <= 0;
             bram_wr_valid <= 0;
 
@@ -33,20 +33,20 @@ module pixel_splitter #(
                 2'd0: begin
                     if (pixel_in_valid) begin
                         pixel_reg <= pixel_in;
-                        // try to write first byte if FIFO ready
+                        
                         bram_wr_data <= pixel_in[23:16];
                         if (bram_wr_ready) begin
                             bram_wr_valid <= 1'b1;
                             state <= 2'd1;
-                            pixel_in_ready <= 1'b1; // accept pixel
+                            pixel_in_ready <= 1'b1; 
                         end else begin
-                            // wait for FIFO ready
+                            
                             state <= 2'd0;
                         end
                     end
                 end
                 2'd1: begin
-                    // write byte1
+                    
                     bram_wr_data <= pixel_reg[15:8];
                     if (bram_wr_ready) begin
                         bram_wr_valid <= 1'b1;
